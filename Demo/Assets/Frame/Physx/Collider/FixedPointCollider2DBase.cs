@@ -1,21 +1,20 @@
 using System;
 using PEMath;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SimplePhysx
 {
     /// <summary>
     /// 基于定点数的碰撞检测基类
     /// </summary>
-    public abstract class FixedPointCollider2DBase:MonoBehaviour
+    public abstract class FixedPointCollider2DBase
     {
         public string Name { get; protected set; }
         public PEVector3 Pos { get; set; }
 
         List<(PEVector3 normal, PEVector3 adjust)> collisionInfos = new List<(PEVector3 normal, PEVector3 adjust)>();
         public void ClacCollison(List<FixedPointCollider2DBase> colliders, ref PEVector3 velocity, ref PEVector3 adjust)
-        {
+        { 
             if (velocity == PEVector3.zero)
             {
                 return;

@@ -2,14 +2,16 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace SimplePhysx
 {
     public class FixedPointSphereCollider2D : FixedPointCollider2DBase
     {
-
+        [SerializeField]
+        private float editRadius;
+        public float EditRadius { get { return editRadius; } set { editRadius = value; } }
         public PEInt Radius { get; protected set; }
-
 
         public void Init(PEVector3 pos, float radius)
         {

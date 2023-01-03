@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-#if UNITY_ENV
+#if UNITY_EDITOR
 using UnityEngine;
 #endif
 
@@ -21,7 +21,7 @@ namespace PEMath
             this.z = z;
         }
 
-#if UNITY_ENV
+#if UNITY_EDITOR
         public PEVector3(Vector3 v) {
             this.x = (PEInt)v.x;
             this.y = (PEInt)v.y;
@@ -283,7 +283,7 @@ namespace PEMath
             return PECalc.Acos(value);
         }
 
-#if UNITY_ENV
+#if UNITY_EDITOR
         /// <summary>
         /// 获取浮点数向量（注意：不可再进行逻辑运算）
         /// </summary>

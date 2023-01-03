@@ -8,21 +8,24 @@ namespace SimplePhysx
 {
     public class FixedPointBoxCollider2D : FixedPointCollider2DBase
     {
+        public float editLength;
+        public float editWidth;
         //长宽高
-        public PEVector3 Size { get; protected set; }
+        public PEInt Length { get; protected set; }
+        public PEInt Width { get; protected set; }
         //三个轴的单位向量
         public PEVector3 XAxis { get; protected set; }
         public PEVector3 YAxis { get; protected set; }
         public PEVector3 ZAxis { get; protected set; }
 
-        public void Init(PEVector3 pos, PEVector3 size, PEVector3 xAxis, PEVector3 yAxis, PEVector3 zAxis)
+        public void Init(PEVector3 pos, PEInt length,PEInt width, PEVector3 xAxis, PEVector3 yAxis, PEVector3 zAxis)
         {
             Pos = pos;
-            Size = size;
+            Length = length;
+            Width = width;
             XAxis = xAxis;
             YAxis = yAxis;
             ZAxis = zAxis;
-            //DrawLine(Vertexs);
         }
         public override bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref PEVector3 normal, ref PEVector3 adjust)
         {
@@ -81,10 +84,10 @@ namespace SimplePhysx
         public PEVector3[] GetVertexs()
         {
             var vertexs = new PEVector3[4];
-            vertexs[0] = Pos + XAxis * Size.x / 2 + ZAxis * Size.z / 2;
-            vertexs[1] = Pos + XAxis * Size.x / 2 - ZAxis * Size.z / 2;
-            vertexs[2] = Pos - XAxis * Size.x / 2 - ZAxis * Size.z / 2;
-            vertexs[3] = Pos - XAxis * Size.x / 2 + ZAxis * Size.z / 2;
+            vertexs[0] = Pos + XAxis * Length / 2 + ZAxis * Width / 2;
+            vertexs[1] = Pos + XAxis * Length / 2 - ZAxis * Width / 2;
+            vertexs[2] = Pos - XAxis * Length / 2 - ZAxis * Width / 2;
+            vertexs[3] = Pos - XAxis * Length / 2 + ZAxis * Width / 2;
             return vertexs;
         }
         public PEVector3[] GetBorders(PEVector3[] vertexs)
