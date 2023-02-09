@@ -1,11 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using SimplePhysx;
 
 [CustomEditor(typeof(FP_BoxCol2DComponent))]
-public class BoxColliderEditor : Editor
+public class BoxCollider2DEditor : Editor
 {
     private void OnSceneGUI()
     {
@@ -24,10 +21,15 @@ public class BoxColliderEditor : Editor
         var rotation = new Vector3(0, boxCol.YRotation, 0);
         var right = Quaternion.Euler(rotation) * boxCol.transform.right;
         var forward = Quaternion.Euler(rotation) * boxCol.transform.forward;
+        var up = Quaternion.Euler(rotation) * boxCol.transform.up;
         vertexs[0] = boxCol.transform.position + right * boxCol.Length / 2 + forward * boxCol.Width / 2;
         vertexs[1] = boxCol.transform.position + right * boxCol.Length / 2 - forward * boxCol.Width / 2;
         vertexs[2] = boxCol.transform.position - right * boxCol.Length / 2 - forward * boxCol.Width / 2;
         vertexs[3] = boxCol.transform.position - right * boxCol.Length / 2 + forward * boxCol.Width / 2;
+        for (int i = 0; i < vertexs.Length; i++)
+        {
+            vertexs[i] += up*boxCol.GizmosHeight;
+        }
         return vertexs;
     }
 }

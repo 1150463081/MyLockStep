@@ -7,7 +7,7 @@ using PEMath;
 public class FP_SphereCol2DComponent : MonoBehaviour
 {
     public float radius;
-
+    public float GizmosHeight;
     public FixedPointSphereCollider2D SphereCol { get; private set; }
     private void Awake()
     {

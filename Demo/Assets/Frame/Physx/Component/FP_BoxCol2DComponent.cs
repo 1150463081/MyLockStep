@@ -9,6 +9,7 @@ public class FP_BoxCol2DComponent : MonoBehaviour
     public float Length;
     public float Width;
     public float YRotation;
+    public float GizmosHeight;
 
     public FixedPointBoxCollider2D boxCol;
 
