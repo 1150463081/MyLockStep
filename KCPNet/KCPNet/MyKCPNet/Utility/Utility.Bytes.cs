@@ -53,7 +53,8 @@ namespace KCPNet
                 {
                     using (GZipStream gz = new GZipStream(outMs, CompressionMode.Compress, true))
                     {
-                        gz.Write(bytes);
+                        //todo 可能出现问题
+                        gz.Write(bytes,0,bytes.Length);
                         gz.Close();
                         return outMs.ToArray();
                     }

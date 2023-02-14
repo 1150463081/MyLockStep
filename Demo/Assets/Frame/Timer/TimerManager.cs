@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace LockStepFrame
 {
-    public class TimerManager
+    [Module]
+    public class TimerManager:Module
     {
         private class Timer
         {
@@ -41,15 +43,15 @@ namespace LockStepFrame
                 IsActive = true;
                 targetTime = delayTime + (nowLoopCount + 1) * waitTime;
             }
-            public void ContinueTimer()
+            public void PlayTimer()
             {
                 IsActive = true;
             }
-            public void StopTimer()
+            public void PauseTimer()
             {
                 IsActive = false;
             }
-            public void KillTimer()
+            public void StopTimer()
             {
                 IsCompleted = true;
             }
@@ -77,9 +79,25 @@ namespace LockStepFrame
                 }
             }
         }
+
+        private Dictionary<int, Timer> timerDict = new Dictionary<int, Timer>();
+        private Queue<Timer> stopQueue = new Queue<Timer>();
+
         public void Tick(float delta)
         {
-
+            stopQueue.Clear();
+            foreach (var timer in timerDict.Values)
+            {
+                timer.TickTimer(delta);
+                if (timer.IsCompleted)
+                {
+                    stopQueue.Enqueue(timer);
+                }
+            }
+            while (stopQueue.Count > 0)
+            {
+                timerDict.Remove(stopQueue.Dequeue().TimerId);
+            }
         }
 
         public int StartTimer(float delayTime, float waitTime, int maxLoopCount, Action loopEndEvt, Action timerEndEvt)
@@ -87,7 +105,24 @@ namespace LockStepFrame
             Timer timer = new Timer();
             int timerId = timer.InitTimer(delayTime, waitTime, maxLoopCount, loopEndEvt, timerEndEvt);
             timer.StartTimer();
+            timerDict[timerId] = timer;
             return timerId;
         }
+        public void PlayTimer()
+        {
+        }
+        public void PauseTimer()
+        {
+        }
+        public void StopTimer()
+        {
+        }
+
+
+        public override void OnUpdate()
+        {
+            Tick(Time.deltaTime);
+        }
+
     }
 }
