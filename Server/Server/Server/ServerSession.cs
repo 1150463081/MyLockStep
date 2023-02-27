@@ -10,17 +10,19 @@ namespace Server
     {
         protected override void OnConnected()
         {
-            Utility.Debug.Log($"Session {SessionId} OnConnected");
+            Utility.Log.Debug($"Session {SessionId} OnConnected");
         }
 
         protected override void OnDisConnected()
         {
-            Utility.Debug.Log($"Session {SessionId} OnDisConnected");
+            Utility.Log.Debug($"Session {SessionId} OnDisConnected");
         }
 
         protected override void OnReciveMsg(NetMsg msg)
         {
             //todo RecvMsg
+            Utility.Log.Debug($"ReciveMsg:{msg.NetCmd}");
+            ServerMgr.Instance.ReceiveMsg(SessionId, msg);
         }
 
         protected override void OnUpdate(DateTime now)

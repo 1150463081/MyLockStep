@@ -31,7 +31,7 @@ namespace LockStepFrame
 				{
 					types = assembly.GetTypes();
 				}
-				types = types.Where(t => { return type.IsAssignableFrom(t) && type.IsClass && !type.IsAbstract; }).ToArray();
+				types = types.Where(t => { return type.IsAssignableFrom(t) && t.IsClass && !t.IsAbstract; }).ToArray();
 				return types;
 			}
 

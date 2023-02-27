@@ -81,7 +81,6 @@ namespace KCPNet
 
             m_kcpHandle = null;
             m_kcp = null;
-            cts = null;
         }
         public void ReciveData(byte[] buffer)
         {

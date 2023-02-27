@@ -16,3 +16,4 @@ E:\UnityProject\MyLockStep\Server\Server\Server\obj\Debug\netcoreapp3.1\Server.c
 E:\UnityProject\MyLockStep\Server\Server\Server\obj\Debug\netcoreapp3.1\Server.dll
 E:\UnityProject\MyLockStep\Server\Server\Server\obj\Debug\netcoreapp3.1\Server.pdb
 E:\UnityProject\MyLockStep\Server\Server\Server\obj\Debug\netcoreapp3.1\Server.genruntimeconfig.cache
+E:\UnityProject\MyLockStep\Server\Server\Server\bin\Debug\netcoreapp3.1\Kcp.dll

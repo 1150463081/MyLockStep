@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LockStepFrame;
 
-namespace GameCore
+namespace GameCore 
 {
     public class GameEntry : MonoBehaviour
     {
@@ -15,12 +15,6 @@ namespace GameCore
         {
             ModuleManager.Instance.OnStart();
 
-            var TimeMgr= ModuleManager.Instance.GetModule<TimerManager>();
-            Debug.Log("计时开始");
-            TimeMgr.StartTimer(5, 0, 1, () =>
-            {
-                Debug.Log("计时结束");
-            }, null);
         }
         private void Update()
         {

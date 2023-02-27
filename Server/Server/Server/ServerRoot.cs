@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Server
 {
@@ -10,6 +11,7 @@ namespace Server
             while (true)
             {
                 ServerMgr.Instance.Tick();
+                Thread.Sleep(10);
             }   
         }
     }

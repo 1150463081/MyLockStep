@@ -8,9 +8,9 @@ using System.Collections.Generic;
 
 namespace KCPNet
 {
-    public class KCPNet<T,K>
-        where T:KCPSession<K>,new()
-        where K:KCPMsg,new()
+    public class KCPNet<T, K>
+        where T : KCPSession<K>, new()
+        where K : KCPMsg, new()
     {
         private UdpClient udp;
         private IPEndPoint remoteEndPoint;
@@ -23,7 +23,7 @@ namespace KCPNet
 
         #region Server
         private Dictionary<uint, T> sessionDict;
-        public void StartAsServer(string ip,int port)
+        public void StartAsServer(string ip, int port)
         {
             sessionDict = new Dictionary<uint, T>();
             udp = new UdpClient(new IPEndPoint(IPAddress.Parse(ip), port));
@@ -33,7 +33,7 @@ namespace KCPNet
             }
             remoteEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
             Utility.Debug.ColorLog(KCPLogColor.Green, "Server Start...");
-            Task.Run(ServerRecive,cts.Token);
+            Task.Run(ServerRecive, cts.Token);
         }
         public void CloseServer()
         {
@@ -60,18 +60,18 @@ namespace KCPNet
                     break;
                 }
                 result = await udp?.ReceiveAsync();
-                uint sid = BitConverter.ToUInt32(result.Buffer,0);
+                uint sid = BitConverter.ToUInt32(result.Buffer, 0);
                 if (sid == 0)
                 {
                     sid = GenerateSid();
-                    var sidBytes= BitConverter.GetBytes(sid);
+                    var sidBytes = BitConverter.GetBytes(sid);
                     var bytes = new byte[8];
                     Array.Copy(sidBytes, 0, bytes, 4, 4);
                     SendUDPMsg(bytes, result.RemoteEndPoint);
                 }
                 else
                 {
-                    if(!sessionDict.TryGetValue(sid,out var session))
+                    if (!sessionDict.TryGetValue(sid, out var session))
                     {
                         session = new T();
                         session.InitSession(sid, SendUDPMsg, result.RemoteEndPoint);
@@ -109,7 +109,7 @@ namespace KCPNet
 
         #region Client
         public T clientSession;
-        public void StartAsClient(string ip,int port)
+        public void StartAsClient(string ip, int port)
         {
             Utility.Debug.ColorLog(KCPLogColor.Green, "Client Start...");
             udp = new UdpClient(0);
@@ -131,10 +131,10 @@ namespace KCPNet
                 }
 
                 result = await udp.ReceiveAsync();
-                if (Equals(remoteEndPoint,result.RemoteEndPoint))
+                if (Equals(remoteEndPoint, result.RemoteEndPoint))
                 {
-                    uint sid= BitConverter.ToUInt32(result.Buffer, 0);
-                    if(sid == 0)//第一次收到消息，接受sid
+                    uint sid = BitConverter.ToUInt32(result.Buffer, 0);
+                    if (sid == 0)//第一次收到消息，接受sid
                     {
                         if (clientSession != null && clientSession.IsConnected)
                         {
@@ -146,7 +146,7 @@ namespace KCPNet
                             Utility.Debug.Log($"UDP Request Conv Sid:{sid}");
 
                             clientSession = new T();
-                            clientSession.InitSession(sid,SendUDPMsg,remoteEndPoint);
+                            clientSession.InitSession(sid, SendUDPMsg, remoteEndPoint);
                             clientSession.OnSessionClose = OnClientSessionClose;
                         }
                     }
@@ -171,28 +171,29 @@ namespace KCPNet
                 clientSession.CloseSession();
             }
         }
-        public Task<bool> ConnectServer(int interval,int maxCheckInterval=5000)
+        public Task<bool> ConnectServer(int interval, int maxCheckInterval = 5000)
         {
             int checkTime = 0;
             SendUDPMsg(new byte[4], remoteEndPoint);
-            var task= Task.Run(async () =>
-            {
-                while (true)
-                {
-                    await Task.Delay(interval);
-                    checkTime += interval;
-                    if (clientSession != null && clientSession.IsConnected)
-                    {
-                        return true;
-                    }
-                    else {
-                        if (checkTime > maxCheckInterval)
-                        {
-                            return false;
-                        }
-                    }
-                }
-            });
+            var task = Task.Run(async () =>
+             {
+                 while (true)
+                 {
+                     await Task.Delay(interval);
+                     checkTime += interval;
+                     if (clientSession != null && clientSession.IsConnected)
+                     {
+                         return true;
+                     }
+                     else
+                     {
+                         if (checkTime > maxCheckInterval)
+                         {
+                             return false;
+                         }
+                     }
+                 }
+             });
             return task;
         }
         private void OnClientSessionClose(uint sessionId)
@@ -206,7 +207,7 @@ namespace KCPNet
         }
         #endregion
 
-        void SendUDPMsg(byte[] bytes ,IPEndPoint remotePoint)
+        void SendUDPMsg(byte[] bytes, IPEndPoint remotePoint)
         {
             if (udp != null)
             {
@@ -220,6 +221,15 @@ namespace KCPNet
             {
                 item.SendMsg(bytes);
             }
+        }
+        public void SendMsg(uint sessionId, K msg)
+        {
+            if (!sessionDict.ContainsKey(sessionId))
+            {
+                Utility.Debug.Error($"Not Exist Session:{sessionId}!Send Msg Failed!");
+                return;
+            }
+            sessionDict[sessionId].SendMsg(msg);
         }
     }
 }
