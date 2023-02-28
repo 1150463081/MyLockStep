@@ -16,5 +16,10 @@ namespace LockStepFrame
         public virtual void OnStart() { }
         public virtual void OnUpdate() { }
         public virtual void OnDestroy() { }
+        protected T GetModule<T>()
+            where T:Module
+        {
+            return ModuleManager.Instance.GetModule<T>();
+        }
     }
 }

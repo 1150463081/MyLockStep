@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LockStepFrame;
 using NetProtocol;
 
 namespace GameCore
@@ -19,6 +20,8 @@ namespace GameCore
         public override void Handle(NetMsg msg)
         {
             var mMsg = msg as S2CEnterBattleRoomMsg;
+            bool isMain = ModuleManager.Instance.GetModule<NetWorkMgr>().SessionId == mMsg.SessionId;
+            ModuleManager.Instance.GetModule<GameUnitMgr>().AddHero( isMain);
         }
     }
 }

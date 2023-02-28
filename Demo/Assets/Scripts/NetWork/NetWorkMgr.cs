@@ -10,25 +10,29 @@ using NetProtocol;
 namespace GameCore
 {
     [Module]
-    public class NetWorkMgr: Module
+    public class NetWorkMgr : Module
     {
+        public uint SessionId => client.clientSession == null ? 0 : client.clientSession.SessionId;
         public const string ip = "127.0.0.1";
         public const int port = 0415;
 
         private KCPNet<ClientSession, NetMsg> client;
-        private Dictionary<NetCmd, NetHandle> handleDict; 
+        private Dictionary<NetCmd, NetHandle> handleDict;
+        private Queue<NetMsg> msgQueue = new Queue<NetMsg>();
+        private static readonly string msgQueueLock = "lock_msgQueue";
 
         public override void OnInit()
         {
             client = new KCPNet<ClientSession, NetMsg>();
+            InitHandle();
         }
         public override void OnStart()
         {
             StartConnect();
         }
-        public void Init()
+        public override void OnUpdate()
         {
-            
+            HandleMsg();
         }
         public void StartConnect()
         {
@@ -36,7 +40,7 @@ namespace GameCore
             client.ConnectServer(200, 5000);
         }
 
-        public void SendMsg(NetCmd cmd,NetMsg msg)
+        public void SendMsg(NetCmd cmd, NetMsg msg)
         {
             if (client.clientSession == null)
             {
@@ -47,15 +51,27 @@ namespace GameCore
             msg.NetCmd = cmd;
             client.clientSession.SendMsg(msg);
         }
-        public void ReciveMsg(NetMsg msg)
+        public void EnqueueMsg(NetMsg msg)
         {
-            if (handleDict.ContainsKey(msg.NetCmd))
+            lock (msgQueueLock)
             {
-                handleDict[msg.NetCmd]?.Handle(msg);
+                msgQueue.Enqueue(msg);
             }
-            else
+        }
+        private void HandleMsg()
+        {
+            NetMsg msg;
+            while (msgQueue.Count > 0)
             {
-                Debug.LogError($"没有{msg.NetCmd}对应的Handle");
+                msg = msgQueue.Dequeue();
+                if (handleDict.ContainsKey(msg.NetCmd))
+                {
+                    handleDict[msg.NetCmd]?.Handle(msg);
+                }
+                else
+                {
+                    Debug.LogError($"没有{msg.NetCmd}对应的Handle");
+                }
             }
         }
 

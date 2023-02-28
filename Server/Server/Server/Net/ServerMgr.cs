@@ -23,15 +23,17 @@ namespace Server
         {
 
         }
-        public void SendMsg(uint sessionId, NetMsg msg)
+        public void SendMsg(uint sessionId, NetCmd cmd, NetMsg msg)
         {
+            msg.NetCmd = cmd;
             server.SendMsg(sessionId, msg);
         }
-        public void SendMsg(IList<uint> sessionIds,NetMsg msg)
+        public void SendMsg(IList<uint> sessionIds, NetCmd cmd, NetMsg msg)
         {
+            msg.NetCmd = cmd;
             for (int i = 0; i < sessionIds.Count; i++)
             {
-                SendMsg(sessionIds[i], msg);
+                server.SendMsg(sessionIds[i], msg);
             }
         }
         public void ReceiveMsg(uint sessionId, NetMsg msg)

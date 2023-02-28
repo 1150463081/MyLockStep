@@ -8,6 +8,7 @@ namespace NetProtocol
         None,
         C2SEnterBattleRoom,
         S2CEnterBattleRoom,
+        C2SOpKey,
         S2COpKey
 
     }
@@ -30,13 +31,21 @@ namespace NetProtocol
     {
         public int RoomId;
     }
-    public class S2COpKey : NetMsg
+    [Serializable]
+    public class S2COpKeyMsg : NetMsg
     {
+        public int FrameId;
         public MoveKey MoveKey; 
     }
+    [Serializable]
+    public class C2SOpKeyMsg : NetMsg
+    {
+        public MoveKey MoveKey;
+    }
+    [Serializable]
     public class MoveKey
     {
         public long X_Value;
-        public long Y_Value;
+        public long Z_Value;
     }
 }
