@@ -39,12 +39,12 @@ namespace Server
                     continue;
                 }
                 task.LoopIndex++;
-                if (task.LoopIndex <= task.LoopCnt)
+                if (task.LoopIndex <= task.LoopCnt || task.IsLoop)
                 {
                     task.CallEvt?.Invoke();
                     task.DestTime += task.Delay;
                 }
-                if (task.LoopIndex >= task.LoopCnt)
+                if (task.LoopIndex >= task.LoopCnt && !task.IsLoop)
                 {
                     //计时循环结束
                     DeleteTask(task.Id);
@@ -86,6 +86,7 @@ namespace Server
             public Action CancelEvt;
             public int LoopCnt;
             public int LoopIndex;
+            public bool IsLoop => LoopCnt <= 0;
 
             public TickTask(int id, int delay, double destTime, Action callEvt, Action cancelEvt, int loopCnt)
             {

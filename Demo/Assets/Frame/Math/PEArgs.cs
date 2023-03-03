@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace PEMath
+namespace LockStepFrame
 {
     public struct PEArgs
     {

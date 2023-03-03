@@ -22,5 +22,13 @@ namespace GameCore
             gameObject = go;
             transform = go.transform;
         }
+        public virtual void OnInit()
+        {
+
+        }
+        public virtual void OnLoadResComplete()
+        {
+
+        }
     }
 }

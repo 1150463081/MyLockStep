@@ -1,5 +1,6 @@
 ﻿using System;
 using KCPNet;
+using System.Collections.Generic;
 
 namespace NetProtocol
 {
@@ -22,9 +23,9 @@ namespace NetProtocol
     public class S2CEnterBattleRoomMsg : NetMsg
     {
         /// <summary>
-        /// 新加入房间的玩家
+        /// 房间的玩家
         /// </summary>
-        public uint PlayerId;
+        public List<uint> PlayerId;
     }
     [Serializable]
     public class C2SEnterBattleRoomMsg : NetMsg
@@ -35,12 +36,23 @@ namespace NetProtocol
     public class S2COpKeyMsg : NetMsg
     {
         public int FrameId;
-        public MoveKey MoveKey; 
+        public List<OpKey> OpKeyList;
     }
     [Serializable]
     public class C2SOpKeyMsg : NetMsg
     {
         public MoveKey MoveKey;
+    }
+    [Serializable]
+    public class OpKey 
+    {
+        public uint PlayerId;
+        public OpKeyType KeyType;
+        public MoveKey MoveKey;
+    }
+    public enum OpKeyType
+    {
+        Move
     }
     [Serializable]
     public class MoveKey

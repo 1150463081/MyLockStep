@@ -22,7 +22,7 @@ namespace Server
         {
             //todo RecvMsg
             Utility.Log.Debug($"ReciveMsg:{msg.NetCmd}");
-            ServerMgr.Instance.ReceiveMsg(SessionId, msg);
+            ModuleManager.Instance.GetModule<ServerMgr>().ReceiveMsg(SessionId, msg);
         }
 
         protected override void OnUpdate(DateTime now)

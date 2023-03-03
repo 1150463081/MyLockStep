@@ -22,4 +22,15 @@ namespace Server
             room.AddPlayer(sessionId);
         }
     }
+    public class C2SOpKeyHandle : NetHandle
+    {
+        public override NetCmd NetCmd => NetCmd.C2SOpKey;
+
+        public override void Handle(uint sessionId, NetMsg msg)
+        {
+            var mMsg = msg as C2SOpKeyMsg;
+            var room = BattleRoomMgr.Instance.GetRoomByPlayerId(sessionId);
+            room.InputOpKey(mMsg);
+        }
+    }
 }

@@ -2,7 +2,7 @@
 ///  Acos数值查寻表
 /// </summary>
 
-namespace PEMath
+namespace LockStepFrame
 {
     class AcosTable
     {

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PEMath
+namespace LockStepFrame
 {
     public class PECalc
     {

@@ -34,6 +34,10 @@ namespace GameCore
         {
             HandleMsg();
         }
+        public override void OnDestroy()
+        {
+            client.CloseClient();
+        }
         public void StartConnect()
         {
             client.StartAsClient(ip, port);

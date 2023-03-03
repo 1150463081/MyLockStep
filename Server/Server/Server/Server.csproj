@@ -10,16 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Kcp">
-      <HintPath>..\Plugins\Kcp.dll</HintPath>
-    </Reference>
     <Reference Include="KCPNet">
       <HintPath>..\Plugins\KCPNet.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="BattleRoom\" />
   </ItemGroup>
 
 </Project>

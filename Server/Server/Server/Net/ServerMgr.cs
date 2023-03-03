@@ -6,22 +6,28 @@ using System.Linq;
 
 namespace Server
 {
-    public class ServerMgr : Singleton<ServerMgr>
+    [Module]
+    public class ServerMgr :Module
     {
         public const string ip = "127.0.0.1";
         public const int port = 0415;
 
         KCPNet<ServerSession, NetMsg> server;
         Dictionary<NetCmd, NetHandle> handleDict;
+
+
+        public override void Init()
+        {
+            StartServer();
+        }
+        public override void Update()
+        {
+        }
         public void StartServer()
         {
             InitHandle();
             server = new KCPNet<ServerSession, NetMsg>();
             server.StartAsServer(ip, port);
-        }
-        public void Tick()
-        {
-
         }
         public void SendMsg(uint sessionId, NetCmd cmd, NetMsg msg)
         {

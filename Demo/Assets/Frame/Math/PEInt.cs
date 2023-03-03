@@ -1,6 +1,6 @@
 using System;
 
-namespace PEMath
+namespace LockStepFrame
 {
     [Serializable]
     public struct PEInt

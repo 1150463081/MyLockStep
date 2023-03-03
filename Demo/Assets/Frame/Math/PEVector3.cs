@@ -3,11 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-#if UNITY_EDITOR
-using UnityEngine;
-#endif
 
-namespace PEMath
+using UnityEngine;
+
+namespace LockStepFrame
 {
     public struct PEVector3
     {
@@ -21,13 +20,13 @@ namespace PEMath
             this.z = z;
         }
 
-#if UNITY_EDITOR
+
         public PEVector3(Vector3 v) {
             this.x = (PEInt)v.x;
             this.y = (PEInt)v.y;
             this.z = (PEInt)v.z;
         }
-#endif
+
 
         public PEInt this[int index]
         {
@@ -283,14 +282,12 @@ namespace PEMath
             return PECalc.Acos(value);
         }
 
-#if UNITY_EDITOR
         /// <summary>
         /// 获取浮点数向量（注意：不可再进行逻辑运算）
         /// </summary>
         public Vector3 ConvertViewVector3() {
             return new Vector3(x.RawFloat, y.RawFloat, z.RawFloat);
         }
-#endif
 
         public long[] CovertLongArray()
         {

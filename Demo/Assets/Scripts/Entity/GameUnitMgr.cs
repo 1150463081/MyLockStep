@@ -13,18 +13,13 @@ namespace GameCore
         private Dictionary<int, EntityBase> entityDict = new Dictionary<int, EntityBase>();
         private HashSet<int> allUrl = new HashSet<int>();
         private int genUrlIndex = 100;
-        public HeroEntity AddHero(bool isMain)
-        {
-            HeroEntity heroEntity = AccrueEntity<HeroEntity>();
-            heroEntity.InitHero(isMain);
-            return heroEntity;
-        }
 
-        private T AccrueEntity<T>()
+        public T AccrueEntity<T>()
             where T : EntityBase, new()
         {
             T entity = new T();
             entity.Url = GenerateUrl();
+            entityDict[entity.Url] = entity;
             return entity;
         }
 

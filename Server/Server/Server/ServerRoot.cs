@@ -7,10 +7,10 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            ServerMgr.Instance.StartServer();
+            ModuleManager.Instance.Init();
             while (true)
             {
-                ServerMgr.Instance.Tick();
+                ModuleManager.Instance.Update();
                 Thread.Sleep(10);
             }   
         }
