@@ -12,6 +12,7 @@ namespace GameCore
 {
     public class HeroEntity : LogicEntity, ISyncUnit
     {
+        public HeroVO HeroVO => BaseVO as HeroVO;
         public uint NetUrl { get; private set; }
         public bool IsMain { get; private set; }
 

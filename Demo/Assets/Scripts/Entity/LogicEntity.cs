@@ -5,15 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using LockStepFrame;
 using SimplePhysx;
+using UnityEngine;
 
 namespace GameCore
 {
-    public class LogicEntity : EntityBase
+    public class LogicEntity : EntityBase,IRollBack
     {
         protected PEVector3 InputDir;
         protected IFixedPointCol2DComponent ColComp;
         protected FixedPointCollider2DBase Col;
 
+        public override void OnInit()
+        {
+            base.OnInit();
+            ModuleManager.Instance.GetModule<RollBackMgr>().Register(this);
+        }
         public override void OnLoadResComplete()
         {
             base.OnLoadResComplete();
@@ -21,10 +27,7 @@ namespace GameCore
             ColComp.InitCollider();
             Col = ColComp.Col;
         }
-        public virtual void LogicTick()
-        {
-            TickMove();
-        }
+
         public virtual void InputMove(PEVector3 dir)
         {
             InputDir = dir;
@@ -33,10 +36,40 @@ namespace GameCore
         {
 
         }
-        protected virtual void TickMove()
+        //逻辑帧随服务器消息更新
+        #region 逻辑帧更新
+        public void LogicTick()
         {
-            Col.Pos += InputDir * 5 * ((PEInt)0.66f);
-            transform.position = Col.Pos.ConvertViewVector3();
+            LogicTickMove();
+        }
+        protected void LogicTickMove()
+        {
+            //逻辑位置更新
+            Col.Pos += InputDir * BaseVO.MoveSpeed * ((PEInt)0.66f);
+            //transform.position = Col.Pos.ConvertViewVector3();
+        }
+        #endregion
+        #region 表现层本地轮询
+        //表现层更新，本地每帧轮询
+        public void ViewTick()
+        {
+            ViewTickMove();
+        }
+        protected void ViewTickMove()
+        {
+            var tgtPos= Col.Pos.ConvertViewVector3();
+            transform.position = Vector3.Lerp(transform.position, tgtPos,.5f);
+        }
+
+
+        #endregion
+        public void TakeSnapShot(SnapShotWriter writer)
+        {
+            writer.Write(Col.Pos);
+        }
+
+        public void RollBackTo()
+        {
         }
     }
 }

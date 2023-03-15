@@ -20,9 +20,18 @@ namespace GameCore
         public override void Handle(NetMsg msg)
         {
             var mMsg = msg as S2CEnterBattleRoomMsg;
-            bool isMain = ModuleManager.Instance.GetModule<NetWorkMgr>().SessionId == mMsg.PlayerId;
+
+            var netWorkMgr = ModuleManager.Instance.GetModule<NetWorkMgr>();
             var battleMgr = ModuleManager.Instance.GetModule<BattleMgr>();
-            ModuleManager.Instance.GetModule<BattleMgr>().AddHero(isMain, mMsg.PlayerId);
+            for (int i = 0; i < mMsg.PlayerId.Count; i++)
+            {
+                if (battleMgr.HasPlayer(mMsg.PlayerId[i]))
+                {
+                    continue;
+                }
+                ModuleManager.Instance.GetModule<BattleMgr>().AddHero(netWorkMgr.SessionId == mMsg.PlayerId[i], mMsg.PlayerId[i]);
+
+            }
         }
     }
     public class S2COpKeyHandle : NetHandle
@@ -32,9 +41,8 @@ namespace GameCore
         public override void Handle(NetMsg msg)
         {
             var mMsg = msg as S2COpKeyMsg;
-            var battleMgr= ModuleManager.Instance.GetModule<BattleMgr>();
+            var battleMgr = ModuleManager.Instance.GetModule<BattleMgr>();
             battleMgr.InputKey(mMsg);
-            battleMgr.LogicTick();
         }
     }
 }

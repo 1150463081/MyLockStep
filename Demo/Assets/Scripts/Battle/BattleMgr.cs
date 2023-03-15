@@ -12,12 +12,22 @@ namespace GameCore
     [Module]
     public class BattleMgr : Module
     {
-        public int FrameId { get; private set; }
+        public int NetFrameId { get; private set; }
+        public int LocalFrameId { get; private set; }
 
         private Dictionary<uint, ISyncUnit> syncUnitDict = new Dictionary<uint, ISyncUnit>();
         private List<HeroEntity> heroList = new List<HeroEntity>();
-        private HashSet<uint> allPlayers=new HashSet<uint>();
+        private HashSet<uint> allPlayers = new HashSet<uint>();
 
+
+        public override void OnUpdate()
+        {
+            base.OnUpdate();
+            for (int i = 0; i < heroList.Count; i++)
+            {
+                heroList[i].ViewTick();
+            }
+        }
 
         public bool HasPlayer(uint netUrl)
         {
@@ -34,7 +44,7 @@ namespace GameCore
         }
         public void InputKey(S2COpKeyMsg msg)
         {
-            FrameId = msg.FrameId;
+            NetFrameId = msg.FrameId;
             ISyncUnit unit;
             OpKey opKey;
             for (int i = 0; i < msg.OpKeyList.Count; i++)
@@ -49,6 +59,9 @@ namespace GameCore
                     Debug.LogError($"不存在单位{opKey.PlayerId}");
                 }
             }
+
+            LogicTick();
+            GetModule<RollBackMgr>().TakeSnapShot();
         }
         public void LogicTick()
         {

@@ -16,6 +16,7 @@ namespace GameCore
         public EntityType EntityType { get; protected set; }
         public GameObject gameObject { get; private set; }
         public Transform transform { get; private set; }
+        public BaseVO BaseVO { get; protected set; }
 
         public void SetObj(GameObject go)
         {
@@ -24,7 +25,8 @@ namespace GameCore
         }
         public virtual void OnInit()
         {
-
+            //todo 属性临时本地创建
+            BaseVO = new BaseVO();
         }
         public virtual void OnLoadResComplete()
         {
