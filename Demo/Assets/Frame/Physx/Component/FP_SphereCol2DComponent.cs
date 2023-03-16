@@ -17,7 +17,7 @@ namespace GameCore
         public void InitCollider()
         {
             SphereCol = new FixedPointSphereCollider2D();
-            SphereCol.Init(new PEVector3(transform.position), radius);
+            SphereCol.Init(new FXVector3(transform.position), radius);
         }
     }
 }

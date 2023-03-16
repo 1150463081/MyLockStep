@@ -11,15 +11,15 @@ namespace SimplePhysx
         [SerializeField]
         private float editRadius;
         public float EditRadius { get { return editRadius; } set { editRadius = value; } }
-        public PEInt Radius { get; protected set; }
+        public FXInt Radius { get; protected set; }
 
-        public void Init(PEVector3 pos, float radius)
+        public void Init(FXVector3 pos, float radius)
         {
             Pos = pos;
-            Radius = new PEInt(radius);
+            Radius = new FXInt(radius);
         }
 
-        public override bool DetectSphereCollider(FixedPointSphereCollider2D sphereCol, ref PEVector3 normal, ref PEVector3 adjust)
+        public override bool DetectSphereCollider(FixedPointSphereCollider2D sphereCol, ref FXVector3 normal, ref FXVector3 adjust)
         {
             var dis = (Pos - sphereCol.Pos).magnitude;
             if (dis > Radius + sphereCol.Radius)
@@ -34,7 +34,7 @@ namespace SimplePhysx
             }
         }
 
-        public override bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref PEVector3 normal, ref PEVector3 adjust)
+        public override bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref FXVector3 normal, ref FXVector3 adjust)
         {
             #region 老的检测方法，速度过快会不准确
             ////矩形中心到圆心的向量bo
@@ -62,19 +62,19 @@ namespace SimplePhysx
             #endregion
             #region 分离轴算法检测
             //方向和圆形盒子所有投影向量集合
-            List<PEVector3> pNormalLst = new List<PEVector3>();
+            List<FXVector3> pNormalLst = new List<FXVector3>();
             //获取方形的投影向量
             var boxVertexs = boxCol.GetVertexs();
             var boxBorders = boxCol.GetBorders(boxVertexs);
-            var pNormal = PEVector3.zero;
+            var pNormal = FXVector3.zero;
             for (int i = 0; i < boxBorders.Length; i++)
             {
-                pNormal = PEVector3.Cross(boxBorders[i], new PEVector3(0, 1, 0)).normalized;
+                pNormal = FXVector3.Cross(boxBorders[i], new FXVector3(0, 1, 0)).normalized;
                 pNormalLst.Add(pNormal);
             }
             //获取圆形的投影向量
             //圆形比较特殊，圆的投影向量就是途经圆心和多边形上离圆心最近的顶点的直线。
-            PEInt minDis = (PEInt)int.MaxValue;
+            FXInt minDis = (FXInt)int.MaxValue;
             for (int i = 0; i < boxVertexs.Length; i++)
             {
                 var dis = (Pos - boxVertexs[i]).magnitude;
@@ -86,9 +86,9 @@ namespace SimplePhysx
             }
             pNormalLst.Add(pNormal);
 
-            PEInt min = int.MaxValue;
-            PEVector3 minNormal = PEVector3.zero;
-            PEVector3 minAdjustNormal = PEVector3.zero;
+            FXInt min = int.MaxValue;
+            FXVector3 minNormal = FXVector3.zero;
+            FXVector3 minAdjustNormal = FXVector3.zero;
 
             for (int i = 0; i < pNormalLst.Count; i++)
             {
@@ -96,13 +96,13 @@ namespace SimplePhysx
                 var mPoints = GetSphereProjectPoint(pNormal);
                 var oPoints = GetProjectedPoints(pNormal, boxVertexs);
                 //检测两段投影是否有重合
-                var adjustNormal = PEVector3.zero;
+                var adjustNormal = FXVector3.zero;
                 var a = GetMaxDis(mPoints, oPoints, ref adjustNormal);
                 var b = (mPoints[1] - mPoints[0]).magnitude + (oPoints[1] - oPoints[0]).magnitude;
                 var c = a - b;
                 if (c > 0)//没有重合
                 {
-                    adjust = PEVector3.zero;
+                    adjust = FXVector3.zero;
                     return false;
                 }
                 if (c.Abs < min)
@@ -121,10 +121,10 @@ namespace SimplePhysx
         /// </summary>
         /// <param name="normal"></param>
         /// <returns></returns>
-        private PEVector3[] GetSphereProjectPoint(PEVector3 normal)
+        private FXVector3[] GetSphereProjectPoint(FXVector3 normal)
         {
-            PEVector3[] projections = new PEVector3[2];
-            var project = PEVector3.Dot(Pos, normal);
+            FXVector3[] projections = new FXVector3[2];
+            var project = FXVector3.Dot(Pos, normal);
             projections[0] = (project - Radius) * normal;
             projections[1] = (project + Radius) * normal;
             return projections;

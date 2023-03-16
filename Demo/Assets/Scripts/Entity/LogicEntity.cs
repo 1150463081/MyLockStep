@@ -11,7 +11,7 @@ namespace GameCore
 {
     public class LogicEntity : EntityBase,IRollBack
     {
-        protected PEVector3 InputDir;
+        protected FXVector3 InputDir;
         protected IFixedPointCol2DComponent ColComp;
         protected FixedPointCollider2DBase Col;
 
@@ -28,7 +28,7 @@ namespace GameCore
             Col = ColComp.Col;
         }
 
-        public virtual void InputMove(PEVector3 dir)
+        public virtual void InputMove(FXVector3 dir)
         {
             InputDir = dir;
         }
@@ -45,7 +45,7 @@ namespace GameCore
         protected void LogicTickMove()
         {
             //逻辑位置更新
-            Col.Pos += InputDir * BaseVO.MoveSpeed * ((PEInt)0.66f);
+            Col.Pos += InputDir * BaseVO.MoveSpeed * ((FXInt)0.66f);
             //transform.position = Col.Pos.ConvertViewVector3();
         }
         #endregion
@@ -68,8 +68,9 @@ namespace GameCore
             writer.Write(Col.Pos);
         }
 
-        public void RollBackTo()
+        public void RollBackTo(SnapShotReader reader)
         {
+            Col.Pos = reader.ReadFXVector3();
         }
     }
 }

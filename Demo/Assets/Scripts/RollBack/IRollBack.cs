@@ -9,6 +9,6 @@ namespace GameCore
     public interface IRollBack
     {
         public void TakeSnapShot(SnapShotWriter writer);
-        public void RollBackTo();
+        public void RollBackTo(SnapShotReader reader);
     }
 }

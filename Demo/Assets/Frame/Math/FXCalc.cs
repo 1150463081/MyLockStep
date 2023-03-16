@@ -6,22 +6,22 @@ using System.Text;
 
 namespace LockStepFrame
 {
-    public class PECalc
+    public class FXCalc
     {
 
-        public static PEInt Sqrt(PEInt value, int interatorCount = 8)
+        public static FXInt Sqrt(FXInt value, int interatorCount = 8)
         {
-            if (value == PEInt.zero)
+            if (value == FXInt.zero)
             {
                 return 0;
             }
-            if (value < PEInt.zero)
+            if (value < FXInt.zero)
             {
                 throw new Exception();
             }
 
-            PEInt result = value;
-            PEInt history;
+            FXInt result = value;
+            FXInt history;
             int count = 0;
             do
             {
@@ -32,15 +32,15 @@ namespace LockStepFrame
             return result;
         }
 
-        public static PEArgs Acos(PEInt value)
+        public static FXArgs Acos(FXInt value)
         {
-            PEInt rate = (value * AcosTable.HalfIndexCount) + AcosTable.HalfIndexCount;
-            rate = Clamp(rate, PEInt.zero, AcosTable.IndexCount);
-            return new PEArgs(AcosTable.table[rate.RawInt], AcosTable.Multipler);
+            FXInt rate = (value * AcosTable.HalfIndexCount) + AcosTable.HalfIndexCount;
+            rate = Clamp(rate, FXInt.zero, AcosTable.IndexCount);
+            return new FXArgs(AcosTable.table[rate.RawInt], AcosTable.Multipler);
         }
 
 
-        public static PEInt Clamp(PEInt input, PEInt min, PEInt max)
+        public static FXInt Clamp(FXInt input, FXInt min, FXInt max)
         {
             if (input < min)
             {

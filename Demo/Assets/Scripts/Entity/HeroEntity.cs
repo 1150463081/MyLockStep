@@ -31,11 +31,11 @@ namespace GameCore
             switch (opKey.KeyType)
             {
                 case OpKeyType.Move:
-                    PEInt x = PEInt.zero;
+                    FXInt x = FXInt.zero;
                     x.ScaledValue = opKey.MoveKey.X_Value;
-                    PEInt z = PEInt.zero;
+                    FXInt z = FXInt.zero;
                     z.ScaledValue = opKey.MoveKey.Z_Value;
-                    InputMove(new PEVector3(x, 0, z));
+                    InputMove(new FXVector3(x, 0, z));
                     break;
             }
         }

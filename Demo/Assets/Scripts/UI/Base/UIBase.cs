@@ -35,5 +35,11 @@ namespace GameCore
         protected virtual void OnStart() { }
         protected virtual void OnShow() { }
         protected virtual void OnClose() { }
+
+        protected T GetModule<T>()
+            where T : Module
+        {
+            return ModuleManager.Instance.GetModule<T>();
+        }
     }
 }

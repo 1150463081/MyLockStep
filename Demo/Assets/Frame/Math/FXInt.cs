@@ -3,7 +3,7 @@ using System;
 namespace LockStepFrame
 {
     [Serializable]
-    public struct PEInt
+    public struct FXInt
     {
         private long scaledValue;
         public long ScaledValue
@@ -21,47 +21,47 @@ namespace LockStepFrame
         const int BIT_MOVE_COUNT = 10;
         const long MULTIPLIER_FACTOR = 1 << BIT_MOVE_COUNT;
 
-        public static readonly PEInt zero = new PEInt(0);
-        public static readonly PEInt one = new PEInt(1);
+        public static readonly FXInt zero = new FXInt(0);
+        public static readonly FXInt one = new FXInt(1);
 
 
         #region 构造函数
         //内部使用，已经缩放完成的数据
-        private PEInt(long scaledValue)
+        private FXInt(long scaledValue)
         {
             this.scaledValue = scaledValue;
         }
-        public PEInt(int val)
+        public FXInt(int val)
         {
             scaledValue = val * MULTIPLIER_FACTOR;
         }
-        public PEInt(float val)
+        public FXInt(float val)
         {
             scaledValue = (long)Math.Round(val * MULTIPLIER_FACTOR);
         }
         //float损失精度，必须显式转换
-        public static explicit operator PEInt(float f)
+        public static explicit operator FXInt(float f)
         {
-            return new PEInt((long)Math.Round(f * MULTIPLIER_FACTOR));
+            return new FXInt((long)Math.Round(f * MULTIPLIER_FACTOR));
         }
         //int不损失精度，可以隐式转换
-        public static implicit operator PEInt(int i)
+        public static implicit operator FXInt(int i)
         {
-            return new PEInt(i);
+            return new FXInt(i);
         }
         #endregion
 
         #region 运算符
         //加，减，乘，除，取反
-        public static PEInt operator +(PEInt a, PEInt b)
+        public static FXInt operator +(FXInt a, FXInt b)
         {
-            return new PEInt(a.scaledValue + b.scaledValue);
+            return new FXInt(a.scaledValue + b.scaledValue);
         }
-        public static PEInt operator -(PEInt a, PEInt b)
+        public static FXInt operator -(FXInt a, FXInt b)
         {
-            return new PEInt(a.scaledValue - b.scaledValue);
+            return new FXInt(a.scaledValue - b.scaledValue);
         }
-        public static PEInt operator *(PEInt a, PEInt b)
+        public static FXInt operator *(FXInt a, FXInt b)
         {
             long value = a.scaledValue * b.scaledValue;
             if (value >= 0)
@@ -72,59 +72,59 @@ namespace LockStepFrame
             {
                 value = -(-value >> BIT_MOVE_COUNT);
             }
-            return new PEInt(value);
+            return new FXInt(value);
         }
-        public static PEInt operator /(PEInt a, PEInt b)
+        public static FXInt operator /(FXInt a, FXInt b)
         {
             if (b.scaledValue == 0)
             {
                 throw new Exception();
             }
-            return new PEInt((a.scaledValue << BIT_MOVE_COUNT) / b.scaledValue);
+            return new FXInt((a.scaledValue << BIT_MOVE_COUNT) / b.scaledValue);
         }
-        public static PEInt operator -(PEInt value)
+        public static FXInt operator -(FXInt value)
         {
-            return new PEInt(-value.scaledValue);
+            return new FXInt(-value.scaledValue);
         }
-        public static bool operator ==(PEInt a, PEInt b)
+        public static bool operator ==(FXInt a, FXInt b)
         {
             return a.scaledValue == b.scaledValue;
         }
-        public static bool operator !=(PEInt a, PEInt b)
+        public static bool operator !=(FXInt a, FXInt b)
         {
             return a.scaledValue != b.scaledValue;
         }
-        public static bool operator >(PEInt a, PEInt b)
+        public static bool operator >(FXInt a, FXInt b)
         {
             return a.scaledValue > b.scaledValue;
         }
-        public static bool operator <(PEInt a, PEInt b)
+        public static bool operator <(FXInt a, FXInt b)
         {
             return a.scaledValue < b.scaledValue;
         }
-        public static bool operator >=(PEInt a, PEInt b)
+        public static bool operator >=(FXInt a, FXInt b)
         {
             return a.scaledValue >= b.scaledValue;
         }
-        public static bool operator <=(PEInt a, PEInt b)
+        public static bool operator <=(FXInt a, FXInt b)
         {
             return a.scaledValue <= b.scaledValue;
         }
 
-        public static PEInt operator >>(PEInt value, int moveCount)
+        public static FXInt operator >>(FXInt value, int moveCount)
         {
             if (value.scaledValue >= 0)
             {
-                return new PEInt(value.scaledValue >> moveCount);
+                return new FXInt(value.scaledValue >> moveCount);
             }
             else
             {
-                return new PEInt(-(-value.scaledValue >> moveCount));
+                return new FXInt(-(-value.scaledValue >> moveCount));
             }
         }
-        public static PEInt operator <<(PEInt value, int moveCount)
+        public static FXInt operator <<(FXInt value, int moveCount)
         {
-            return new PEInt(value.scaledValue << moveCount);
+            return new FXInt(value.scaledValue << moveCount);
         }
         #endregion
 
@@ -153,11 +153,11 @@ namespace LockStepFrame
                 }
             }
         }
-        public PEInt Abs
+        public FXInt Abs
         {
             get
             {
-                PEInt vInt = this;
+                FXInt vInt = this;
                 if (vInt >= 0)
                 {
                     return vInt;
@@ -175,7 +175,7 @@ namespace LockStepFrame
             {
                 return false;
             }
-            PEInt vInt = (PEInt)obj;
+            FXInt vInt = (FXInt)obj;
             return scaledValue == vInt.scaledValue;
         }
 

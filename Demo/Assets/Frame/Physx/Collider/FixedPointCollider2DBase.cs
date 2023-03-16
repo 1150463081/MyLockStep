@@ -10,17 +10,17 @@ namespace SimplePhysx
     public abstract class FixedPointCollider2DBase
     {
         public string Name { get; protected set; }
-        public PEVector3 Pos { get; set; }
+        public FXVector3 Pos { get; set; }
 
-        List<(PEVector3 normal, PEVector3 adjust)> collisionInfos = new List<(PEVector3 normal, PEVector3 adjust)>();
-        public void ClacCollison(List<FixedPointCollider2DBase> colliders, ref PEVector3 velocity, ref PEVector3 adjust)
+        List<(FXVector3 normal, FXVector3 adjust)> collisionInfos = new List<(FXVector3 normal, FXVector3 adjust)>();
+        public void ClacCollison(List<FixedPointCollider2DBase> colliders, ref FXVector3 velocity, ref FXVector3 adjust)
         { 
-            if (velocity == PEVector3.zero)
+            if (velocity == FXVector3.zero)
             {
                 return;
             }
-            PEVector3 normal = PEVector3.zero;
-            PEVector3 adj = PEVector3.zero;
+            FXVector3 normal = FXVector3.zero;
+            FXVector3 adj = FXVector3.zero;
             collisionInfos.Clear();
             for (int i = 0; i < colliders.Count; i++)
             {
@@ -37,17 +37,17 @@ namespace SimplePhysx
             else if (collisionInfos.Count > 1)//多个物体碰撞
             {
                 //根据所有碰撞法线向量计算中心向量，并计算中心向量与法线向量最大夹角
-                PEVector3 centerNormal = PEVector3.zero;
-                PEVector3 correctNormal = PEVector3.zero;
+                FXVector3 centerNormal = FXVector3.zero;
+                FXVector3 correctNormal = FXVector3.zero;
                 var nomalAngle = CalcMaxCenterNormalAngle(collisionInfos, velocity, ref centerNormal, ref correctNormal);
                 //计算速度的反向量与法线的夹角
-                var v2nAngle = PEVector3.Angle(-velocity, centerNormal);
+                var v2nAngle = FXVector3.Angle(-velocity, centerNormal);
                 //可移动，计算偏移，修正速度
                 if (v2nAngle > nomalAngle)
                 {
 
                     velocity = CorrectVelocity(velocity, correctNormal);
-                    var adjustSum = PEVector3.zero;
+                    var adjustSum = FXVector3.zero;
                     for (int i = 0; i < collisionInfos.Count; i++)
                     {
                         adjustSum += collisionInfos[i].adjust;
@@ -56,7 +56,7 @@ namespace SimplePhysx
                 }
                 else//不可移动
                 {
-                    velocity = PEVector3.zero;
+                    velocity = FXVector3.zero;
                 }
             }
 
@@ -65,7 +65,7 @@ namespace SimplePhysx
         /// <param name="col">碰撞盒</param>
         /// <param name="normal">碰撞面法线向量</param>
         /// <param name="adjust">位置修正向量</param>
-        public bool DetectCollider(FixedPointCollider2DBase col, ref PEVector3 normal, ref PEVector3 adjust)
+        public bool DetectCollider(FixedPointCollider2DBase col, ref FXVector3 normal, ref FXVector3 adjust)
         {
             if (col is FixedPointSphereCollider2D sphereCol)
             {
@@ -81,24 +81,24 @@ namespace SimplePhysx
         /// <param name="sphereCol">球形碰撞盒</param>
         /// <param name="normal">碰撞面法线向量</param>
         /// <param name="adjust">位置修正向量</param>
-        public abstract bool DetectSphereCollider(FixedPointSphereCollider2D sphereCol, ref PEVector3 normal, ref PEVector3 adjust);
+        public abstract bool DetectSphereCollider(FixedPointSphereCollider2D sphereCol, ref FXVector3 normal, ref FXVector3 adjust);
 
         /// <param name="boxCol">盒形碰撞盒</param>
         /// <param name="normal">碰撞面法线向量</param>
         /// <param name="adjust">位置修正向量</param>
-        public abstract bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref PEVector3 normal, ref PEVector3 adjust);
+        public abstract bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref FXVector3 normal, ref FXVector3 adjust);
 
-        private PEVector3 CorrectVelocity(PEVector3 velocity, PEVector3 normal)
+        private FXVector3 CorrectVelocity(FXVector3 velocity, FXVector3 normal)
         {
-            if (normal == PEVector3.zero)
+            if (normal == FXVector3.zero)
             {
                 return velocity;
             }
             //如果速度与法线夹角大于90度，表示正在靠近，需要修正速度
-            if (PEVector3.Angle(velocity, normal) > PEArgs.HALFPI)
+            if (FXVector3.Angle(velocity, normal) > FXArgs.HALFPI)
             {
                 //算出速度在法线上的投影
-                var a = PEVector3.Dot(velocity, normal);
+                var a = FXVector3.Dot(velocity, normal);
                 velocity = -a * normal + velocity;
             }
             return velocity;
@@ -108,7 +108,7 @@ namespace SimplePhysx
         /// </summary>
         /// <param name="collisionInfos"></param>
         /// <returns></returns>
-        private PEArgs CalcMaxCenterNormalAngle(List<(PEVector3 normal, PEVector3 adjust)> collisionInfos, PEVector3 velocity, ref PEVector3 centerNormal, ref PEVector3 correctNormal)
+        private FXArgs CalcMaxCenterNormalAngle(List<(FXVector3 normal, FXVector3 adjust)> collisionInfos, FXVector3 velocity, ref FXVector3 centerNormal, ref FXVector3 correctNormal)
         {
             for (int i = 0; i < collisionInfos.Count; i++)
             {
@@ -119,17 +119,17 @@ namespace SimplePhysx
                 centerNormal /= collisionInfos.Count;
             }
 
-            PEArgs maxAngle = PEArgs.Zero;
-            PEArgs maxCorrectAngle = PEArgs.Zero;
+            FXArgs maxAngle = FXArgs.Zero;
+            FXArgs maxCorrectAngle = FXArgs.Zero;
             for (int i = 0; i < collisionInfos.Count; i++)
             {
-                var tempAngle = PEVector3.Angle(collisionInfos[i].normal, centerNormal);
+                var tempAngle = FXVector3.Angle(collisionInfos[i].normal, centerNormal);
                 if (tempAngle > maxAngle)
                 {
                     maxAngle = tempAngle;
                 }
                 //找出速度方向与法线方向夹角最大的碰撞法线，速度校正由这个法线来决定
-                var tempAngle_2 = PEVector3.Angle(velocity, collisionInfos[i].normal);
+                var tempAngle_2 = FXVector3.Angle(velocity, collisionInfos[i].normal);
                 if (tempAngle_2 > maxCorrectAngle)
                 {
                     maxCorrectAngle = tempAngle_2;
@@ -147,15 +147,15 @@ namespace SimplePhysx
         /// <param name="normal"></param>
         /// <param name="vertexs"></param>
         /// <returns></returns>
-        protected PEVector3[] GetProjectedPoints(PEVector3 normal, PEVector3[] vertexs)
+        protected FXVector3[] GetProjectedPoints(FXVector3 normal, FXVector3[] vertexs)
         {
             //计算每个顶点在轴上的投影点
-            PEVector3[] projections = new PEVector3[2];
-            PEInt min = int.MaxValue;
-            PEInt max = int.MinValue;
+            FXVector3[] projections = new FXVector3[2];
+            FXInt min = int.MaxValue;
+            FXInt max = int.MinValue;
             for (int i = 0; i < vertexs.Length; i++)
             {
-                var project = PEVector3.Dot(vertexs[i], normal);
+                var project = FXVector3.Dot(vertexs[i], normal);
                 if (project < min)
                 {
                     min = project;
@@ -169,9 +169,9 @@ namespace SimplePhysx
             }
             return projections;
         }
-        protected PEInt GetMaxDis(PEVector3[] arr1, PEVector3[] arr2, ref PEVector3 normal)
+        protected FXInt GetMaxDis(FXVector3[] arr1, FXVector3[] arr2, ref FXVector3 normal)
         {
-            PEInt max = int.MinValue;
+            FXInt max = int.MinValue;
             for (int i = 0; i < arr1.Length; i++)
             {
                 for (int j = 0; j < arr2.Length; j++)

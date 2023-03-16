@@ -9,6 +9,7 @@
       "Server/1.0.0": {
         "dependencies": {
           "NetProtocol": "1.0.0",
+          "Kcp": "2.0.0.0",
           "KCPNet": "1.0.0.0"
         },
         "runtime": {
@@ -18,6 +19,14 @@
       "NetProtocol/1.0.0": {
         "runtime": {
           "NetProtocol.dll": {}
+        }
+      },
+      "Kcp/2.0.0.0": {
+        "runtime": {
+          "Kcp.dll": {
+            "assemblyVersion": "2.0.0.0",
+            "fileVersion": "2.0.0.0"
+          }
         }
       },
       "KCPNet/1.0.0.0": {
@@ -38,6 +47,11 @@
     },
     "NetProtocol/1.0.0": {
       "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Kcp/2.0.0.0": {
+      "type": "reference",
       "serviceable": false,
       "sha512": ""
     },

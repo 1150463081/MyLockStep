@@ -3,23 +3,23 @@ using System;
 
 namespace LockStepFrame
 {
-    public struct PEArgs
+    public struct FXArgs
     {
         public int value;
         public uint multipler;
 
-        public PEArgs(int value, uint multipler)
+        public FXArgs(int value, uint multipler)
         {
             this.value = value;
             this.multipler = multipler;
         }
 
-        public static PEArgs Zero = new PEArgs(0, 10000);
-        public static PEArgs HALFPI = new PEArgs(15708, 10000);
-        public static PEArgs PI = new PEArgs(31416, 10000);
-        public static PEArgs TWOPI = new PEArgs(62832, 10000);
+        public static FXArgs Zero = new FXArgs(0, 10000);
+        public static FXArgs HALFPI = new FXArgs(15708, 10000);
+        public static FXArgs PI = new FXArgs(31416, 10000);
+        public static FXArgs TWOPI = new FXArgs(62832, 10000);
 
-        public static bool operator >(PEArgs a, PEArgs b)
+        public static bool operator >(FXArgs a, FXArgs b)
         {
             if (a.multipler == b.multipler)
             {
@@ -30,7 +30,7 @@ namespace LockStepFrame
                 throw new System.Exception("multipler is unequal.");
             }
         }
-        public static bool operator <(PEArgs a, PEArgs b)
+        public static bool operator <(FXArgs a, FXArgs b)
         {
             if (a.multipler == b.multipler)
             {
@@ -41,7 +41,7 @@ namespace LockStepFrame
                 throw new System.Exception("multipler is unequal.");
             }
         }
-        public static bool operator >=(PEArgs a, PEArgs b)
+        public static bool operator >=(FXArgs a, FXArgs b)
         {
             if (a.multipler == b.multipler)
             {
@@ -52,7 +52,7 @@ namespace LockStepFrame
                 throw new System.Exception("multipler is unequal.");
             }
         }
-        public static bool operator <=(PEArgs a, PEArgs b)
+        public static bool operator <=(FXArgs a, FXArgs b)
         {
             if (a.multipler == b.multipler)
             {
@@ -63,7 +63,7 @@ namespace LockStepFrame
                 throw new System.Exception("multipler is unequal.");
             }
         }
-        public static bool operator ==(PEArgs a, PEArgs b)
+        public static bool operator ==(FXArgs a, FXArgs b)
         {
             if (a.multipler == b.multipler)
             {
@@ -74,7 +74,7 @@ namespace LockStepFrame
                 throw new System.Exception("multipler is unequal.");
             }
         }
-        public static bool operator !=(PEArgs a, PEArgs b)
+        public static bool operator !=(FXArgs a, FXArgs b)
         {
             if (a.multipler == b.multipler)
             {
@@ -107,7 +107,7 @@ namespace LockStepFrame
 
         public override bool Equals(object obj)
         {
-            return obj is PEArgs args &&
+            return obj is FXArgs args &&
                 value == args.value &&
                 multipler == args.multipler;
         }

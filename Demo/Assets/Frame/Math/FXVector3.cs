@@ -8,12 +8,12 @@ using UnityEngine;
 
 namespace LockStepFrame
 {
-    public struct PEVector3
+    public struct FXVector3
     {
-        public PEInt x;
-        public PEInt y;
-        public PEInt z;
-        public PEVector3(PEInt x, PEInt y, PEInt z)
+        public FXInt x;
+        public FXInt y;
+        public FXInt z;
+        public FXVector3(FXInt x, FXInt y, FXInt z)
         {
             this.x = x;
             this.y = y;
@@ -21,14 +21,14 @@ namespace LockStepFrame
         }
 
 
-        public PEVector3(Vector3 v) {
-            this.x = (PEInt)v.x;
-            this.y = (PEInt)v.y;
-            this.z = (PEInt)v.z;
+        public FXVector3(Vector3 v) {
+            this.x = (FXInt)v.x;
+            this.y = (FXInt)v.y;
+            this.z = (FXInt)v.z;
         }
 
 
-        public PEInt this[int index]
+        public FXInt this[int index]
         {
             get
             {
@@ -62,113 +62,113 @@ namespace LockStepFrame
         }
 
         #region 定义常用向量
-        public static PEVector3 zero
+        public static FXVector3 zero
         {
             get
             {
-                return new PEVector3(0, 0, 0);
+                return new FXVector3(0, 0, 0);
             }
         }
-        public static PEVector3 one
+        public static FXVector3 one
         {
             get
             {
-                return new PEVector3(1, 1, 1);
+                return new FXVector3(1, 1, 1);
             }
         }
-        public static PEVector3 forward
+        public static FXVector3 forward
         {
             get
             {
-                return new PEVector3(0, 0, 1);
+                return new FXVector3(0, 0, 1);
             }
         }
-        public static PEVector3 back
+        public static FXVector3 back
         {
             get
             {
-                return new PEVector3(0, 0, -1);
+                return new FXVector3(0, 0, -1);
             }
         }
-        public static PEVector3 left
+        public static FXVector3 left
         {
             get
             {
-                return new PEVector3(-1, 0, 0);
+                return new FXVector3(-1, 0, 0);
             }
         }
-        public static PEVector3 right
+        public static FXVector3 right
         {
             get
             {
-                return new PEVector3(1, 0, 0);
+                return new FXVector3(1, 0, 0);
             }
         }
-        public static PEVector3 up
+        public static FXVector3 up
         {
             get
             {
-                return new PEVector3(0, 1, 0);
+                return new FXVector3(0, 1, 0);
             }
         }
-        public static PEVector3 down
+        public static FXVector3 down
         {
             get
             {
-                return new PEVector3(0, -1, 0);
+                return new FXVector3(0, -1, 0);
             }
         }
         #endregion
 
         #region 运算符
-        public static PEVector3 operator +(PEVector3 v1, PEVector3 v2)
+        public static FXVector3 operator +(FXVector3 v1, FXVector3 v2)
         {
-            PEInt x = v1.x + v2.x;
-            PEInt y = v1.y + v2.y;
-            PEInt z = v1.z + v2.z;
-            return new PEVector3(x, y, z);
+            FXInt x = v1.x + v2.x;
+            FXInt y = v1.y + v2.y;
+            FXInt z = v1.z + v2.z;
+            return new FXVector3(x, y, z);
         }
-        public static PEVector3 operator -(PEVector3 v1, PEVector3 v2)
+        public static FXVector3 operator -(FXVector3 v1, FXVector3 v2)
         {
-            PEInt x = v1.x - v2.x;
-            PEInt y = v1.y - v2.y;
-            PEInt z = v1.z - v2.z;
-            return new PEVector3(x, y, z);
+            FXInt x = v1.x - v2.x;
+            FXInt y = v1.y - v2.y;
+            FXInt z = v1.z - v2.z;
+            return new FXVector3(x, y, z);
         }
-        public static PEVector3 operator *(PEVector3 v, PEInt value)
+        public static FXVector3 operator *(FXVector3 v, FXInt value)
         {
-            PEInt x = v.x * value;
-            PEInt y = v.y * value;
-            PEInt z = v.z * value;
-            return new PEVector3(x, y, z);
+            FXInt x = v.x * value;
+            FXInt y = v.y * value;
+            FXInt z = v.z * value;
+            return new FXVector3(x, y, z);
         }
-        public static PEVector3 operator *(PEInt value, PEVector3 v)
+        public static FXVector3 operator *(FXInt value, FXVector3 v)
         {
-            PEInt x = v.x * value;
-            PEInt y = v.y * value;
-            PEInt z = v.z * value;
-            return new PEVector3(x, y, z);
+            FXInt x = v.x * value;
+            FXInt y = v.y * value;
+            FXInt z = v.z * value;
+            return new FXVector3(x, y, z);
         }
-        public static PEVector3 operator /(PEVector3 v, PEInt value)
+        public static FXVector3 operator /(FXVector3 v, FXInt value)
         {
-            PEInt x = v.x / value;
-            PEInt y = v.y / value;
-            PEInt z = v.z / value;
-            return new PEVector3(x, y, z);
+            FXInt x = v.x / value;
+            FXInt y = v.y / value;
+            FXInt z = v.z / value;
+            return new FXVector3(x, y, z);
         }
-        public static PEVector3 operator -(PEVector3 v)
+        public static FXVector3 operator -(FXVector3 v)
         {
-            PEInt x = -v.x;
-            PEInt y = -v.y;
-            PEInt z = -v.z;
-            return new PEVector3(x, y, z);
+            FXInt x = -v.x;
+            FXInt y = -v.y;
+            FXInt z = -v.z;
+            return new FXVector3(x, y, z);
         }
 
-        public static bool operator ==(PEVector3 v1, PEVector3 v2)
+        public static bool operator ==(FXVector3 v1, FXVector3 v2)
         {
             return v1.x == v2.x && v1.y == v2.y && v1.z == v2.z;
         }
-        public static bool operator !=(PEVector3 v1, PEVector3 v2)
+        public static bool operator !=(FXVector3 v1, FXVector3 v2)
         {
             return v1.x != v2.x || v1.y != v2.y || v1.z != v2.z;
         }
@@ -178,7 +178,7 @@ namespace LockStepFrame
         /// <summary>
         /// 当前向量长度平方
         /// </summary>
-        public PEInt sqrMagnitude
+        public FXInt sqrMagnitude
         {
             get
             {
@@ -186,30 +186,30 @@ namespace LockStepFrame
             }
         }
 
-        public static PEInt SqrMagnitude(PEVector3 v)
+        public static FXInt SqrMagnitude(FXVector3 v)
         {
             return v.x * v.x + v.y * v.y + v.z * v.z;
         }
 
-        public PEInt magnitude
+        public FXInt magnitude
         {
             get
             {
-                return PECalc.Sqrt(this.sqrMagnitude);
+                return FXCalc.Sqrt(this.sqrMagnitude);
             }
         }
 
         /// <summary>
         /// 返回当前定点向量的单位向量
         /// </summary>
-        public PEVector3 normalized
+        public FXVector3 normalized
         {
             get
             {
                 if (magnitude > 0)
                 {
-                    PEInt rate = PEInt.one / magnitude;
-                    return new PEVector3(x * rate, y * rate, z * rate);
+                    FXInt rate = FXInt.one / magnitude;
+                    return new FXVector3(x * rate, y * rate, z * rate);
                 }
                 else
                 {
@@ -223,12 +223,12 @@ namespace LockStepFrame
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public static PEVector3 Normalize(PEVector3 v)
+        public static FXVector3 Normalize(FXVector3 v)
         {
             if (v.magnitude > 0)
             {
-                PEInt rate = PEInt.one / v.magnitude;
-                return new PEVector3(v.x * rate, v.y * rate, v.z * rate);
+                FXInt rate = FXInt.one / v.magnitude;
+                return new FXVector3(v.x * rate, v.y * rate, v.z * rate);
             }
             else
             {
@@ -241,7 +241,7 @@ namespace LockStepFrame
         /// </summary>
         public void Normalize()
         {
-            PEInt rate = PEInt.one / magnitude;
+            FXInt rate = FXInt.one / magnitude;
             x *= rate;
             y *= rate;
             z *= rate;
@@ -250,7 +250,7 @@ namespace LockStepFrame
         /// <summary>
         /// 点乘
         /// </summary>
-        public static PEInt Dot(PEVector3 a, PEVector3 b)
+        public static FXInt Dot(FXVector3 a, FXVector3 b)
         {
             return a.x * b.x + a.y * b.y + a.z * b.z;
         }
@@ -258,9 +258,9 @@ namespace LockStepFrame
         /// <summary>
         /// 叉乘
         /// </summary>
-        public static PEVector3 Cross(PEVector3 a, PEVector3 b)
+        public static FXVector3 Cross(FXVector3 a, FXVector3 b)
         {
-            return new PEVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+            return new FXVector3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
         }
 
         /// <summary>
@@ -269,17 +269,17 @@ namespace LockStepFrame
         /// <param name="from"></param>
         /// <param name="to"></param>
         /// <returns></returns>
-        public static PEArgs Angle(PEVector3 from, PEVector3 to)
+        public static FXArgs Angle(FXVector3 from, FXVector3 to)
         {
-            PEInt dot = Dot(from, to);
-            PEInt mod = from.magnitude * to.magnitude;
+            FXInt dot = Dot(from, to);
+            FXInt mod = from.magnitude * to.magnitude;
             if (mod == 0)
             {
-                return PEArgs.Zero;
+                return FXArgs.Zero;
             }
-            PEInt value = dot / mod;
+            FXInt value = dot / mod;
             //反余弦函数计算
-            return PECalc.Acos(value);
+            return FXCalc.Acos(value);
         }
 
         /// <summary>
@@ -300,7 +300,7 @@ namespace LockStepFrame
             {
                 return false;
             }
-            PEVector3 v = (PEVector3)obj;
+            FXVector3 v = (FXVector3)obj;
             return v.x == x && v.y == y && v.z == z;
         }
 

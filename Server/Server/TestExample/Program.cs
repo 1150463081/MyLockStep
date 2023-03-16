@@ -2,6 +2,7 @@
 using Server;
 using System.Threading;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace TestExample
 {
@@ -9,42 +10,22 @@ namespace TestExample
     {
         static void Main(string[] args)
         {
-            MsTickTimer timer = new MsTickTimer();
-            int interval = 2000;
-            int loopCount = 200;
-            Task.Run(() =>
-            {
-                Task.Delay(2000);
-                DateTime histroyTime = DateTime.UtcNow;
-                int i = 0;
-                double sum = 0;
-                try
-                {
-                    timer.AddTask(interval, () =>
-                    {
-                        TimeSpan ts = DateTime.UtcNow - histroyTime;
-                        histroyTime = DateTime.UtcNow;
-                        double delta = ts.TotalMilliseconds - interval;
-                        i++;
-                        sum += Math.Abs(delta);
-                        Utility.Log.Debug($"第{i}次计时结束,误差{delta},{DateTime.UtcNow}");
-                    }, ()=> {
-                        Utility.Log.Debug($"平均误差:{sum / (loopCount * 1f)}");
-                    }, loopCount);
-                }
-                catch(Exception e)
-                {
-                    Utility.Log.Error(e.ToString());
-                }
-            });
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    timer.UpdateTask();
-                    Task.Delay(5);
-                }
-            });
+            MemoryStream ms = new MemoryStream();
+            long a = 1;
+            long b = 2;
+            long c = 3;
+            BinaryWriter writer = new BinaryWriter(ms);
+            writer.Write(a);
+            writer.Write(b);
+            writer.Write(c);
+
+            ms.Position = 0;
+            BinaryReader reader = new BinaryReader(ms);
+            long a1 = reader.ReadInt64();
+            long b1 = reader.ReadInt64();
+            long c1 = reader.ReadInt64();
+            Console.WriteLine($"a:{a1},b:{b1},c:{c1}");
+
             Console.ReadKey();
         }
     }

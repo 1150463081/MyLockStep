@@ -3,16 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LockStepFrame;
 
 namespace GameCore
 {
-    public class BaseVO
+    public class GameEvent
     {
-        public FXInt MoveSpeed { get; protected set; }
-        public BaseVO()
+        public class LockStep
         {
-            MoveSpeed = 5;
+            public static Action<int> LocalFrameChange;
+            public static Action<int> NetFrameChange;
         }
     }
 }

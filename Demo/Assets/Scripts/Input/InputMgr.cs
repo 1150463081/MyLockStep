@@ -27,8 +27,8 @@ namespace GameCore
         }
         public void InputMoveKey(float x, float z)
         {
-            PEInt fixedX = (PEInt)x;
-            PEInt fixedZ = (PEInt)z;
+            FXInt fixedX = (FXInt)x;
+            FXInt fixedZ = (FXInt)z;
             MoveKey moveKey = new MoveKey();
             moveKey.X_Value = fixedX.ScaledValue;
             moveKey.Z_Value = fixedZ.ScaledValue;

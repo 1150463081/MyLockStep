@@ -38,18 +38,22 @@ namespace GameCore
             {
                 members[i].TakeSnapShot(snapShotWriter);
             }
-            var buffer = stream.GetBuffer();
-            var stringbuilder = new StringBuilder();
-            for (int i = 0; i < buffer.Length; i++)
-            {
-                stringbuilder.Append(buffer[i]);
-            }
-            Debug.LogError($"SnapShot:{stringbuilder.ToString()}");
+            stream.Position = 0;
             snapShotWriter.Flush();
         }
-        public void RollBackTo(int Frame)
+        public void RollBackTo(int frame)
         {
-
+            if(frame>= snapShotLst.Count)
+            {
+                Debug.LogError($"Roll Back To {frame} Failed!!");
+                return;
+            }
+            var stream = snapShotLst[frame];
+            snapShotReader.Init(stream);
+            for (int i = 0; i < members.Count; i++)
+            {
+                members[i].RollBackTo(snapShotReader);
+            }
         }
         public void Register(IRollBack r)
         {

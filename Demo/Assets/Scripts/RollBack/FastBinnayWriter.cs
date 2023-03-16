@@ -65,6 +65,7 @@ namespace GameCore
             } while ((value >>= 7) != 0);
             _ioBuffer[_ioIndex - 1] &= 0x7F;
             _position += count;
+            _stream.Write(_ioBuffer, 0, _ioIndex);
         }
 
 
@@ -88,6 +89,7 @@ namespace GameCore
             } while ((value >>= 7) != 0);
             _ioBuffer[_ioIndex - 1] &= 0x7F;
             _position += count;
+            _stream.Write(_ioBuffer, 0, _ioIndex);
         }
 
         public void Write(string value)
@@ -104,6 +106,7 @@ namespace GameCore
             int actual = _encoding.GetBytes(value, 0, value.Length, _ioBuffer, _ioIndex);
             _ioIndex += actual;
             _position += actual;
+            _stream.Write(_ioBuffer, 0, _ioIndex);
         }
 
         public void Write(bool value)

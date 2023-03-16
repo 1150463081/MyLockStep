@@ -41,7 +41,6 @@ namespace Server
         }
         private void TickLogicFrame()
         {
-            frameIdx++;
             S2COpKeyMsg msg = new S2COpKeyMsg()
             {
                 FrameId = frameIdx,
@@ -62,6 +61,7 @@ namespace Server
             }
             opKeyList.Clear();
             ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2COpKey, msg);
+            frameIdx++;
         }
     }
 }

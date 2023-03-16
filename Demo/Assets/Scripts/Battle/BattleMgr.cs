@@ -45,6 +45,7 @@ namespace GameCore
         public void InputKey(S2COpKeyMsg msg)
         {
             NetFrameId = msg.FrameId;
+            GameEvent.LockStep.NetFrameChange?.Invoke(NetFrameId);
             ISyncUnit unit;
             OpKey opKey;
             for (int i = 0; i < msg.OpKeyList.Count; i++)
