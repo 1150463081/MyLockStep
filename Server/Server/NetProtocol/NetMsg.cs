@@ -18,10 +18,13 @@ namespace NetProtocol
     {
         public uint SessionId;
         public NetCmd NetCmd;
+        public long Time;
     }
     [Serializable]
     public class S2CEnterBattleRoomMsg : NetMsg
     {
+        //服务器逻辑帧开始时间戳
+        public long FrameStartTime;
         /// <summary>
         /// 房间的玩家
         /// </summary>

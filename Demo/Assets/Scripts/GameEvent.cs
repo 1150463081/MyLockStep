@@ -10,8 +10,8 @@ namespace GameCore
     {
         public class LockStep
         {
-            public static Action<int> LocalFrameChange;
-            public static Action<int> NetFrameChange;
+            public static Action<int> ClientFrameChange;
+            public static Action<int> ServerFrameChange;
         }
     }
 }

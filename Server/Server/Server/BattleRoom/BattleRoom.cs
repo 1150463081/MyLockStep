@@ -13,11 +13,13 @@ namespace Server
         private Dictionary<uint, BattlePlayer> playerDict = new Dictionary<uint, BattlePlayer>();
         private List<C2SOpKeyMsg> opKeyList = new List<C2SOpKeyMsg>();
         private int frameIdx;
+        private long frameStartTime;
         public void Init(int roomId)
         {
             RoomId = roomId;
             //初始化帧计时
             ModuleManager.Instance.GetModule<TimerMgr>().AddMsTickTimerTask(ServerDefine.ServerLogicFrameIntervalMs, TickLogicFrame, null, 0);
+            frameStartTime= Utility.Time.MillisecondNow();
         }
         public void AddPlayer(uint sessionId)
         {
@@ -33,7 +35,7 @@ namespace Server
 
             BattleRoomMgr.Instance.RegisterPlayer(sessionId, this);
 
-            ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2CEnterBattleRoom, new S2CEnterBattleRoomMsg() { PlayerId = allPlayerId });
+            ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2CEnterBattleRoom, new S2CEnterBattleRoomMsg() { FrameStartTime=frameStartTime, PlayerId = allPlayerId });
         }
         public void InputOpKey(C2SOpKeyMsg opKey)
         {
@@ -41,6 +43,7 @@ namespace Server
         }
         private void TickLogicFrame()
         {
+            frameIdx++;
             S2COpKeyMsg msg = new S2COpKeyMsg()
             {
                 FrameId = frameIdx,
@@ -59,9 +62,9 @@ namespace Server
                     msg.OpKeyList.Add(opkey);
                 }
             }
+            msg.Time = Utility.Time.MillisecondNow();
             opKeyList.Clear();
             ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2COpKey, msg);
-            frameIdx++;
         }
     }
 }

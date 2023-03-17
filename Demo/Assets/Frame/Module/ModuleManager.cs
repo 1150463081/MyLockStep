@@ -38,6 +38,13 @@ namespace LockStepFrame
                 moduleArr[i].OnUpdate();
             }
         }
+        public void OnFixedUpdate()
+        {
+            for (int i = 0; i < moduleCount; i++)
+            {
+                moduleArr[i].OnFixedUpdate();
+            }
+        }
         public void OnDestroy()
         {
             for (int i = 0; i < moduleCount; i++)

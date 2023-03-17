@@ -30,7 +30,7 @@ namespace GameCore
         /// </summary>
         public void TakeSnapShot()
         {
-            int frame = GetModule<BattleMgr>().LocalFrameId;
+            int frame = GetModule<BattleMgr>().CFrameId ;
             var stream = AccrueStream();
             snapShotLst.Add(stream);
             snapShotWriter.Init(stream);
@@ -49,6 +49,7 @@ namespace GameCore
                 return;
             }
             var stream = snapShotLst[frame];
+            stream.Position = 0;
             snapShotReader.Init(stream);
             for (int i = 0; i < members.Count; i++)
             {

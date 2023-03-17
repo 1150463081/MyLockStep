@@ -12,8 +12,8 @@ namespace GameCore
     [Module]
     public class BattleMgr : Module
     {
-        public int NetFrameId { get; private set; }
-        public int LocalFrameId { get; private set; }
+        public int SFrameId { get; private set; }
+        public int CFrameId { get; private set; }
 
         private Dictionary<uint, ISyncUnit> syncUnitDict = new Dictionary<uint, ISyncUnit>();
         private List<HeroEntity> heroList = new List<HeroEntity>();
@@ -44,8 +44,8 @@ namespace GameCore
         }
         public void InputKey(S2COpKeyMsg msg)
         {
-            NetFrameId = msg.FrameId;
-            GameEvent.LockStep.NetFrameChange?.Invoke(NetFrameId);
+            SFrameId = msg.FrameId;
+            GameEvent.LockStep.ServerFrameChange?.Invoke(SFrameId);
             ISyncUnit unit;
             OpKey opKey;
             for (int i = 0; i < msg.OpKeyList.Count; i++)
@@ -61,16 +61,29 @@ namespace GameCore
                 }
             }
 
-            LogicTick();
+            ServerLogicTick();
             GetModule<RollBackMgr>().TakeSnapShot();
         }
-        public void LogicTick()
+        public void ServerLogicTick()
         {
             //Tick Hero
             for (int i = 0; i < heroList.Count; i++)
             {
                 heroList[i].LogicTick();
             }
+        }
+        public void ClientLogicTick()
+        {
+            CFrameId++;
+            GameEvent.LockStep.ClientFrameChange?.Invoke(CFrameId);
+            if (CFrameId < 7)
+            {
+                Debug.LogError($"C:{CFrameId},{Utility.Time.MillisecondNow()}");
+            }
+        }
+        public void StartLocalFrame(long frameStartTime)
+        {
+            GetModule<TimerManager>().AddMsTickTimerTask(66, ClientLogicTick, null, 0, frameStartTime);
         }
     }
 }

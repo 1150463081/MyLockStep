@@ -23,6 +23,7 @@ namespace GameCore
 
             var netWorkMgr = ModuleManager.Instance.GetModule<NetWorkMgr>();
             var battleMgr = ModuleManager.Instance.GetModule<BattleMgr>();
+            battleMgr.StartLocalFrame(mMsg.FrameStartTime);
             for (int i = 0; i < mMsg.PlayerId.Count; i++)
             {
                 if (battleMgr.HasPlayer(mMsg.PlayerId[i]))

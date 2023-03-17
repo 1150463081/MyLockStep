@@ -20,6 +20,10 @@ namespace GameCore
         {
             ModuleManager.Instance.OnUpdate();
         }
+        private void FixedUpdate()
+        {
+            ModuleManager.Instance.OnFixedUpdate();
+        }
         private void OnDestroy()
         {
             ModuleManager.Instance.OnDestroy();

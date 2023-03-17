@@ -21,7 +21,15 @@ namespace GameCore
         protected override void OnReciveMsg(NetMsg msg)
         {
             //！！！在子线程中接受，需到主线程处理
-            Debug.Log($"Recive Msg:{msg.NetCmd}");
+           
+            if(msg is S2COpKeyMsg mMsg)
+            {
+                if (mMsg.FrameId < 7)
+                {
+                    Debug.LogWarning($"S:{mMsg.FrameId},{mMsg.Time}");
+                }
+            }
+
             var netMgr = ModuleManager.Instance.GetModule<NetWorkMgr>();
             netMgr.EnqueueMsg(msg);
         }

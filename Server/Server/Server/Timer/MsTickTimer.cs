@@ -17,7 +17,7 @@ namespace Server
 
         public int AddTask(int delay, Action callEvt, Action cancelEvt, int loopCnt = 1)
         {
-            var destTime = GetUTCNowMilliseconds() + delay;
+            var destTime = Utility.Time.MillisecondNow() + delay;
             var tId = GenerateTaskId();
             var task = new TickTask(tId, delay, destTime, callEvt, cancelEvt, loopCnt);
             if (taskDict.TryAdd(tId, task))
@@ -31,7 +31,7 @@ namespace Server
         }
         public void UpdateTask()
         {
-            var nowTime = GetUTCNowMilliseconds();
+            var nowTime = Utility.Time.MillisecondNow();
             foreach (var task in taskDict.Values)
             {
                 if (nowTime < task.DestTime)
@@ -64,11 +64,6 @@ namespace Server
             }
         }
 
-        private double GetUTCNowMilliseconds()
-        {
-            var ts = DateTime.UtcNow - startTime;
-            return ts.TotalMilliseconds;
-        }
         private int GenerateTaskId()
         {
             lock (locker)
