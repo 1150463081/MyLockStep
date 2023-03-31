@@ -42,6 +42,14 @@ namespace GameCore
         {
             LogicTickMove();
         }
+        public void ServerLogicTick()
+        {
+
+        }
+        public void ClientLogicTick()
+        {
+
+        }
         protected void LogicTickMove()
         {
             //逻辑位置更新

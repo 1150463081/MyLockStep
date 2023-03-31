@@ -3,6 +3,8 @@ using Server;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace TestExample
 {
@@ -10,21 +12,22 @@ namespace TestExample
     {
         static void Main(string[] args)
         {
-            MemoryStream ms = new MemoryStream();
-            long a = 1;
-            long b = 2;
-            long c = 3;
-            BinaryWriter writer = new BinaryWriter(ms);
-            writer.Write(a);
-            writer.Write(b);
-            writer.Write(c);
+            List<int> a = new List<int>() { 1, 2, 3, 4 };
+            List<int> b = new List<int>() { 3, 4, 5, 6 };
 
-            ms.Position = 0;
-            BinaryReader reader = new BinaryReader(ms);
-            long a1 = reader.ReadInt64();
-            long b1 = reader.ReadInt64();
-            long c1 = reader.ReadInt64();
-            Console.WriteLine($"a:{a1},b:{b1},c:{c1}");
+            var c = a.Except(b);
+            var d = b.Except(a);
+
+            foreach (var item in c)
+            {
+                Console.WriteLine($"{item}");
+            }
+            foreach (var item in d)
+            {
+                Console.WriteLine($"{item}");
+            }
+
+            Console.WriteLine($"{string.IsNullOrEmpty(" ")},{string.IsNullOrWhiteSpace("")},,{string.IsNullOrWhiteSpace(" ")}");
 
             Console.ReadKey();
         }

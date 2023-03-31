@@ -19,7 +19,7 @@ namespace Server
             RoomId = roomId;
             //初始化帧计时
             ModuleManager.Instance.GetModule<TimerMgr>().AddMsTickTimerTask(ServerDefine.ServerLogicFrameIntervalMs, TickLogicFrame, null, 0);
-            frameStartTime= Utility.Time.MillisecondNow();
+            frameStartTime = Utility.Time.MillisecondNow();
         }
         public void AddPlayer(uint sessionId)
         {
@@ -35,7 +35,7 @@ namespace Server
 
             BattleRoomMgr.Instance.RegisterPlayer(sessionId, this);
 
-            ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2CEnterBattleRoom, new S2CEnterBattleRoomMsg() { FrameStartTime=frameStartTime, PlayerId = allPlayerId });
+            ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2CEnterBattleRoom, new S2CEnterBattleRoomMsg() { FrameStartTime = frameStartTime, PlayerId = allPlayerId });
         }
         public void InputOpKey(C2SOpKeyMsg opKey)
         {
@@ -57,7 +57,7 @@ namespace Server
                     var opkey = new OpKey()
                     {
                         PlayerId = opKeyList[i].SessionId,
-                        MoveKey = opKeyList[i].MoveKey
+                        MoveKey = opKeyList[i].OpKey.MoveKey
                     };
                     msg.OpKeyList.Add(opkey);
                 }

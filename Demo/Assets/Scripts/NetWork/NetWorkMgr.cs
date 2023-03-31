@@ -13,7 +13,7 @@ namespace GameCore
     public class NetWorkMgr : Module
     {
         public uint SessionId => client.clientSession == null ? 0 : client.clientSession.SessionId;
-        public const string ip = "127.0.0.1";
+        public const string ip = "10.0.10.34";
         public const int port = 0415;
 
         private KCPNet<ClientSession, NetMsg> client;

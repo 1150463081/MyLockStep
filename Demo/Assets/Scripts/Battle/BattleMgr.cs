@@ -12,8 +12,6 @@ namespace GameCore
     [Module]
     public class BattleMgr : Module
     {
-        public int SFrameId { get; private set; }
-        public int CFrameId { get; private set; }
 
         private Dictionary<uint, ISyncUnit> syncUnitDict = new Dictionary<uint, ISyncUnit>();
         private List<HeroEntity> heroList = new List<HeroEntity>();
@@ -61,10 +59,11 @@ namespace GameCore
                 }
             }
 
-            ServerLogicTick();
+            ServerLogicTick(SFrameId);
             GetModule<RollBackMgr>().TakeSnapShot();
         }
-        public void ServerLogicTick()
+
+        private void ServerLogicTick(int sFrameId)
         {
             //Tick Hero
             for (int i = 0; i < heroList.Count; i++)
@@ -72,18 +71,12 @@ namespace GameCore
                 heroList[i].LogicTick();
             }
         }
-        public void ClientLogicTick()
+
+        private void ClientLogicTick()
         {
             CFrameId++;
             GameEvent.LockStep.ClientFrameChange?.Invoke(CFrameId);
-            if (CFrameId < 7)
-            {
-                Debug.LogError($"C:{CFrameId},{Utility.Time.MillisecondNow()}");
-            }
-        }
-        public void StartLocalFrame(long frameStartTime)
-        {
-            GetModule<TimerManager>().AddMsTickTimerTask(66, ClientLogicTick, null, 0, frameStartTime);
+            //对所有帧同步行为进行预测
         }
     }
 }

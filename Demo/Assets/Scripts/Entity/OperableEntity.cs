@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LockStepFrame;
 
 namespace GameCore
 {
-    public class BaseVO
+    //可操作单位
+    public class OperableEntity:LogicEntity
     {
-        public FXInt MoveSpeed { get; protected set; }
-        public BaseVO()
+        /// <summary>
+        /// 预测指令
+        /// </summary>
+        public void ForcastOpkey()
         {
-            MoveSpeed = 2;
+
         }
     }
 }

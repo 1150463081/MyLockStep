@@ -18,7 +18,8 @@ namespace GameCore
             if (x != 0 || z != 0)
             {
                 InputMoveKey(x, z);
-            }else if (x!=lastX||z!=lastZ)
+            }
+            else if (x != lastX || z != lastZ)
             {
                 InputMoveKey(x, z);
             }
@@ -32,7 +33,8 @@ namespace GameCore
             MoveKey moveKey = new MoveKey();
             moveKey.X_Value = fixedX.ScaledValue;
             moveKey.Z_Value = fixedZ.ScaledValue;
-            GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SOpKey, new C2SOpKeyMsg() { MoveKey = moveKey });
+            OpKey opKey = new OpKey() { MoveKey = moveKey, KeyType = OpKeyType.Move };
+            GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SOpKey, new C2SOpKeyMsg() { OpKey = opKey });
         }
     }
 }

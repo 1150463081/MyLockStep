@@ -44,7 +44,7 @@ namespace NetProtocol
     [Serializable]
     public class C2SOpKeyMsg : NetMsg
     {
-        public MoveKey MoveKey;
+        public OpKey OpKey;
     }
     [Serializable]
     public class OpKey 
