@@ -55,6 +55,7 @@ namespace NetProtocol
     }
     public enum OpKeyType
     {
+        None,
         Move
     }
     [Serializable]

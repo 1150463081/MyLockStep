@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using NetProtocol;
+using System.Linq;
 
 namespace Server
 {
@@ -50,6 +51,7 @@ namespace Server
                 OpKeyList = new List<OpKey>()
             };
 
+            var recivePlayer = new List<uint>();
             if (opKeyList.Count > 0)
             {
                 for (int i = 0; i < opKeyList.Count; i++)
@@ -57,11 +59,25 @@ namespace Server
                     var opkey = new OpKey()
                     {
                         PlayerId = opKeyList[i].SessionId,
-                        MoveKey = opKeyList[i].OpKey.MoveKey
+                        MoveKey = opKeyList[i].OpKey.MoveKey,
+                        KeyType = opKeyList[i].OpKey.KeyType
                     };
+                    recivePlayer.Add(opKeyList[i].SessionId);
                     msg.OpKeyList.Add(opkey);
                 }
             }
+            //没有收到操作指令的玩家当作空指令处理
+            var remainPlayer = allPlayerId.Except(recivePlayer).ToList();
+            for (int i = 0; i < remainPlayer.Count; i++)
+            {
+                var opkey = new OpKey()
+                {
+                    PlayerId = remainPlayer[i],
+                    KeyType = OpKeyType.None
+                };
+                msg.OpKeyList.Add(opkey);
+            }
+
             msg.Time = Utility.Time.MillisecondNow();
             opKeyList.Clear();
             ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2COpKey, msg);

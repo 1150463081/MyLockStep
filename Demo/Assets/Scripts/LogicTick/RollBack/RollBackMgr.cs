@@ -30,7 +30,7 @@ namespace GameCore
         /// </summary>
         public void TakeSnapShot()
         {
-            int frame = GetModule<BattleMgr>().CFrameId ;
+            int frame = GetModule<LogicTickMgr>().CFrameId ;
             var stream = AccrueStream();
             snapShotLst.Add(stream);
             snapShotWriter.Init(stream);

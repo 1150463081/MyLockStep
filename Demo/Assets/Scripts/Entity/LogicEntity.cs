@@ -11,9 +11,16 @@ namespace GameCore
 {
     public class LogicEntity : EntityBase,IRollBack
     {
-        protected FXVector3 InputDir;
         protected IFixedPointCol2DComponent ColComp;
         protected FixedPointCollider2DBase Col;
+
+        //本地预测和输入的未验证指令队列
+        public Queue<OperateInfo> localOpQueue = new Queue<OperateInfo>();
+
+        #region
+        //移动朝向
+        protected FXVector3 MoveDir;
+        #endregion
 
         public override void OnInit()
         {
@@ -28,32 +35,20 @@ namespace GameCore
             Col = ColComp.Col;
         }
 
-        public virtual void InputMove(FXVector3 dir)
-        {
-            InputDir = dir;
-        }
-        public virtual void InputSkill()
-        {
-
-        }
         //逻辑帧随服务器消息更新
         #region 逻辑帧更新
-        public void LogicTick()
-        {
-            LogicTickMove();
-        }
         public void ServerLogicTick()
         {
 
         }
         public void ClientLogicTick()
         {
-
+            LogicTickMove();
         }
         protected void LogicTickMove()
         {
             //逻辑位置更新
-            Col.Pos += InputDir * BaseVO.MoveSpeed * ((FXInt)0.66f);
+            Col.Pos += MoveDir * BaseVO.MoveSpeed * ((FXInt)0.66f);
             //transform.position = Col.Pos.ConvertViewVector3();
         }
         #endregion

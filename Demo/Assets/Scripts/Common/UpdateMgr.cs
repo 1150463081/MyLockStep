@@ -4,14 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using LockStepFrame;
-using NetProtocol;
-using UnityEngine;
 
 namespace GameCore
 {
     [Module]
-    public class BattleMgr : Module
+    public class UpdateMgr:Module
     {
+        public Action UpdateEvent;
 
+        public override void OnUpdate()
+        {
+            UpdateEvent?.Invoke();
+        }
     }
 }

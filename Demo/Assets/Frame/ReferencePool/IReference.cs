@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LockStepFrame;
-using NetProtocol;
-using UnityEngine;
 
-namespace GameCore
+namespace LockStepFrame
 {
-    [Module]
-    public class BattleMgr : Module
+    public interface IReference
     {
-
+        public void Clear();
     }
 }

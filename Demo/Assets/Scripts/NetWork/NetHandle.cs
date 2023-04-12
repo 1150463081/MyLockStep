@@ -23,14 +23,15 @@ namespace GameCore
 
             var netWorkMgr = ModuleManager.Instance.GetModule<NetWorkMgr>();
             var logictickMgr = ModuleManager.Instance.GetModule<LogicTickMgr>();
+            var gameUnitMgr = ModuleManager.Instance.GetModule<GameUnitMgr>();
             logictickMgr.StartClientFrame(mMsg.FrameStartTime);
             for (int i = 0; i < mMsg.PlayerId.Count; i++)
             {
-                if (battleMgr.HasPlayer(mMsg.PlayerId[i]))
+                if (gameUnitMgr.HasSyncUnit(mMsg.PlayerId[i]))
                 {
                     continue;
                 }
-                ModuleManager.Instance.GetModule<BattleMgr>().AddHero(netWorkMgr.SessionId == mMsg.PlayerId[i], mMsg.PlayerId[i]);
+                gameUnitMgr.AddHero(netWorkMgr.SessionId == mMsg.PlayerId[i], mMsg.PlayerId[i]);
 
             }
         }
@@ -42,8 +43,8 @@ namespace GameCore
         public override void Handle(NetMsg msg)
         {
             var mMsg = msg as S2COpKeyMsg;
-            var battleMgr = ModuleManager.Instance.GetModule<BattleMgr>();
-            battleMgr.InputKey(mMsg);
+            var logicTickMgr = ModuleManager.Instance.GetModule<LogicTickMgr>();
+            logicTickMgr.CheckOutOpKey(mMsg);
         }
     }
 }

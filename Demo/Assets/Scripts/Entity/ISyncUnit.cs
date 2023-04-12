@@ -10,7 +10,6 @@ namespace GameCore
     public interface ISyncUnit
     {
         public uint NetUrl { get; }
-        public void InputKey(OpKey opKey);
         
     }
 }

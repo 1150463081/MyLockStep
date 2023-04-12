@@ -25,23 +25,6 @@ namespace GameCore
             LoadRes();
         }
 
-
-        public void InputKey(OpKey opKey)
-        {
-            switch (opKey.KeyType)
-            {
-                case OpKeyType.Move:
-                    FXInt x = FXInt.zero;
-                    x.ScaledValue = opKey.MoveKey.X_Value;
-                    FXInt z = FXInt.zero;
-                    z.ScaledValue = opKey.MoveKey.Z_Value;
-                    InputMove(new FXVector3(x, 0, z));
-                    break;
-            }
-        }
-
-
-
         private void LoadRes()
         {
             try
