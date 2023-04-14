@@ -66,17 +66,6 @@ namespace Server
                     msg.OpKeyList.Add(opkey);
                 }
             }
-            //没有收到操作指令的玩家当作空指令处理
-            var remainPlayer = allPlayerId.Except(recivePlayer).ToList();
-            for (int i = 0; i < remainPlayer.Count; i++)
-            {
-                var opkey = new OpKey()
-                {
-                    PlayerId = remainPlayer[i],
-                    KeyType = OpKeyType.None
-                };
-                msg.OpKeyList.Add(opkey);
-            }
 
             msg.Time = Utility.Time.MillisecondNow();
             opKeyList.Clear();

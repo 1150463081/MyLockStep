@@ -10,10 +10,9 @@ using LockStepFrame;
 
 namespace GameCore
 {
-    public class HeroEntity : OperableEntity, ISyncUnit
+    public class HeroEntity : OperableEntity
     {
         public HeroVO HeroVO => BaseVO as HeroVO;
-        public uint NetUrl { get; private set; }
         public bool IsMain { get; private set; }
 
         public void InitHero(bool isMain, uint netUrl)

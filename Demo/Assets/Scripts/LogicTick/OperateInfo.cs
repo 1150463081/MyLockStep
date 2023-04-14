@@ -14,11 +14,36 @@ namespace GameCore
         //摇杆方向
         public FXVector3 InputDir { get; set; }
 
+        public void Init(OpKey opKey)
+        {
+            KeyType = opKey.KeyType;
+            if(KeyType== OpKeyType.Move)
+            {
+                FXInt x_Value = new FXInt(opKey.MoveKey.X_Value);
+                FXInt z_value = new FXInt(opKey.MoveKey.Z_Value);
+                InputDir = new FXVector3(x_Value, 0, z_value);
+            }
+        }
         public void Clear()
         {
             KeyType = OpKeyType.None;
             InputDir = default;
         }
-
+        public bool Equals(OpKey opKey)
+        {
+            if (opKey.KeyType != KeyType)
+            {
+                return false;
+            }
+            else if (KeyType == OpKeyType.Move)
+            {
+                if(InputDir.x.ScaledValue!=opKey.MoveKey.X_Value||
+                    InputDir.z.ScaledValue != opKey.MoveKey.Z_Value)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

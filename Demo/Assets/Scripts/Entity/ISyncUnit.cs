@@ -10,6 +10,8 @@ namespace GameCore
     public interface ISyncUnit
     {
         public uint NetUrl { get; }
-        
+        public bool CheckOutOpKey(int sFrameId, OpKey opKey);
+        public void ReleaseOperateInfo(int frameId);
+        public void ReplaceOperateInfo(int frameId, OpKey opKey);
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LockStepFrame;
 using SimplePhysx;
 using UnityEngine;
+using NetProtocol;
 
 namespace GameCore
 {
@@ -14,8 +15,7 @@ namespace GameCore
         protected IFixedPointCol2DComponent ColComp;
         protected FixedPointCollider2DBase Col;
 
-        //本地预测和输入的未验证指令队列
-        public Queue<OperateInfo> localOpQueue = new Queue<OperateInfo>();
+       
 
         #region
         //移动朝向
@@ -34,9 +34,12 @@ namespace GameCore
             ColComp.InitCollider();
             Col = ColComp.Col;
         }
+       
+
 
         //逻辑帧随服务器消息更新
         #region 逻辑帧更新
+
         public void ServerLogicTick()
         {
 
@@ -63,9 +66,10 @@ namespace GameCore
             var tgtPos= Col.Pos.ConvertViewVector3();
             transform.position = Vector3.Lerp(transform.position, tgtPos,.5f);
         }
+        #endregion 
+        
+        
 
-
-        #endregion
         public void TakeSnapShot(SnapShotWriter writer)
         {
             writer.Write(Col.Pos);

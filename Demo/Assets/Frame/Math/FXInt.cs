@@ -27,7 +27,7 @@ namespace LockStepFrame
 
         #region 构造函数
         //内部使用，已经缩放完成的数据
-        private FXInt(long scaledValue)
+        public FXInt(long scaledValue)
         {
             this.scaledValue = scaledValue;
         }
