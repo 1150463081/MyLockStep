@@ -66,14 +66,9 @@ namespace GameCore
         /// </summary>
         /// <param name="opKey"></param>
         /// <returns>和之前的预测帧是否一致</returns>
-        public bool CheckOutOpKey(OpKey opKey, int sFrameId)
+        public bool CheckOutOpKey(int sFrameId, OpKey opKey)
         {
-            if (!localOpDict.ContainsKey(sFrameId))
-            {
-                localOpDict[sFrameId] = ReferencePool.Accrue<OperateInfo>();
-                localOpDict[sFrameId].KeyType = OpKeyType.None;
-            }
-            var operateInfo = localOpDict[sFrameId];
+            var operateInfo = GetOperateInfo(sFrameId);
             bool isEqual = operateInfo.Equals(opKey);
 
             return isEqual;
@@ -83,7 +78,6 @@ namespace GameCore
         {
             if (!localOpDict.ContainsKey(frameId))
             {
-                Debug.LogError($"未缓存{frameId}帧指令，无法释放");
                 return;
             }
             ReferencePool.Release(localOpDict[frameId]);
@@ -98,11 +92,12 @@ namespace GameCore
         }
         public OperateInfo GetOperateInfo(int frameId)
         {
-            if (localOpDict.ContainsKey(frameId))
+            if (!localOpDict.ContainsKey(frameId))
             {
-                return localOpDict[frameId];
+                localOpDict[frameId] = ReferencePool.Accrue<OperateInfo>();
+                localOpDict[frameId].KeyType = OpKeyType.None;
             }
-            return null;
+            return localOpDict[frameId];
         }
     }
 }

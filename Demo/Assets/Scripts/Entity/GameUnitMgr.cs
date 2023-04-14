@@ -34,6 +34,10 @@ namespace GameCore
             syncUnitDict[netUrl] = heroEntity;
             allSyncUnits.Add(heroEntity);
             entityTypeDict[heroEntity.EntityType].Add(heroEntity);
+            if (isMain)
+            {
+                MainHero = heroEntity;
+            }
             return heroEntity;
         }
         public T AccrueEntity<T>()

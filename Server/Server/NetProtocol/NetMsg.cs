@@ -44,6 +44,7 @@ namespace NetProtocol
     [Serializable]
     public class C2SOpKeyMsg : NetMsg
     {
+        public int FrameId;
         public OpKey OpKey;
     }
     [Serializable]

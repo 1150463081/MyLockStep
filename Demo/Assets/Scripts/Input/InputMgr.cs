@@ -28,6 +28,7 @@ namespace GameCore
             }
             lastX = x;
             lastZ = z;
+
         }
         private void InputMoveKey(float x, float z)
         {
@@ -38,7 +39,6 @@ namespace GameCore
             operateInfo.InputDir = new FXVector3(fixedX, 0, fixedZ);
             GetModule<LogicTickMgr>().SendOpKey(operateInfo);
         }
-
        
     }
 }

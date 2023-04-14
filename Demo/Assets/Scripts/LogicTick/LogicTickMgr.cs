@@ -84,7 +84,6 @@ namespace GameCore
                 ChaseFrame(SFrameId);
             }
         }
-        //todo 告知服务器是哪一帧消息，等服务器执行到对应帧再返回
         /// <summary>
         /// 每帧记录玩家指令，但每个逻辑帧只发送一次有效指令
         /// </summary>
@@ -104,7 +103,7 @@ namespace GameCore
                 opKey.MoveKey = moveKey;
                 opKey.KeyType = OpKeyType.Move;
             }
-            GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SOpKey, new C2SOpKeyMsg() { OpKey = opKey });
+            GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SOpKey, new C2SOpKeyMsg() { FrameId = CFrameId, OpKey = opKey });
             GetModule<GameUnitMgr>().MainHero.InputKey(operateInfo);
         }
 

@@ -12,7 +12,7 @@ namespace Server
 
         private List<uint> allPlayerId = new List<uint>();
         private Dictionary<uint, BattlePlayer> playerDict = new Dictionary<uint, BattlePlayer>();
-        private List<C2SOpKeyMsg> opKeyList = new List<C2SOpKeyMsg>();
+        private Dictionary<int, List<C2SOpKeyMsg>> opKeyDict = new Dictionary<int, List<C2SOpKeyMsg>>();
         private int frameIdx;
         private long frameStartTime;
         public void Init(int roomId)
@@ -40,7 +40,11 @@ namespace Server
         }
         public void InputOpKey(C2SOpKeyMsg opKey)
         {
-            opKeyList.Add(opKey);
+            if (!opKeyDict.ContainsKey(opKey.FrameId))
+            {
+                opKeyDict[opKey.FrameId] = new List<C2SOpKeyMsg>();
+            }
+            opKeyDict[opKey.FrameId].Add(opKey);
         }
         private void TickLogicFrame()
         {
@@ -50,9 +54,9 @@ namespace Server
                 FrameId = frameIdx,
                 OpKeyList = new List<OpKey>()
             };
+            opKeyDict.TryGetValue(frameIdx, out var opKeyList);
 
-            var recivePlayer = new List<uint>();
-            if (opKeyList.Count > 0)
+            if (opKeyList!=null&&opKeyList.Count > 0)
             {
                 for (int i = 0; i < opKeyList.Count; i++)
                 {
@@ -62,13 +66,11 @@ namespace Server
                         MoveKey = opKeyList[i].OpKey.MoveKey,
                         KeyType = opKeyList[i].OpKey.KeyType
                     };
-                    recivePlayer.Add(opKeyList[i].SessionId);
                     msg.OpKeyList.Add(opkey);
                 }
             }
 
             msg.Time = Utility.Time.MillisecondNow();
-            opKeyList.Clear();
             ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2COpKey, msg);
         }
     }

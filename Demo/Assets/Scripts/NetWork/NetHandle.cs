@@ -24,7 +24,6 @@ namespace GameCore
             var netWorkMgr = ModuleManager.Instance.GetModule<NetWorkMgr>();
             var logictickMgr = ModuleManager.Instance.GetModule<LogicTickMgr>();
             var gameUnitMgr = ModuleManager.Instance.GetModule<GameUnitMgr>();
-            logictickMgr.StartClientFrame(mMsg.FrameStartTime);
             for (int i = 0; i < mMsg.PlayerId.Count; i++)
             {
                 if (gameUnitMgr.HasSyncUnit(mMsg.PlayerId[i]))
@@ -34,6 +33,8 @@ namespace GameCore
                 gameUnitMgr.AddHero(netWorkMgr.SessionId == mMsg.PlayerId[i], mMsg.PlayerId[i]);
 
             }
+            logictickMgr.StartClientFrame(mMsg.FrameStartTime);
+
         }
     }
     public class S2COpKeyHandle : NetHandle
