@@ -37,6 +37,7 @@ namespace GameCore
             if (isMain)
             {
                 MainHero = heroEntity;
+                GameEvent.Player.OnMainHeroAdd?.Invoke();
             }
             return heroEntity;
         }

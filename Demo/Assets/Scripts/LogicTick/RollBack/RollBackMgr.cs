@@ -13,7 +13,7 @@ namespace GameCore
     public class RollBackMgr:Module
     {
         private List<IRollBack> members=new List<IRollBack>();
-        private List<MemoryStream> snapShotLst = new List<MemoryStream>();
+        private Dictionary<int, MemoryStream> snapShotDict = new Dictionary<int, MemoryStream>();
         private Queue<MemoryStream> streamPool = new Queue<MemoryStream>();
         private SnapShotWriter snapShotWriter;
         private SnapShotReader snapShotReader;
@@ -28,11 +28,10 @@ namespace GameCore
         /// <summary>
         /// 每次逻辑帧结束时统一进行快照
         /// </summary>
-        public void TakeSnapShot()
+        public void TakeSnapShot(int frameId)
         {
-            int frame = GetModule<LogicTickMgr>().CFrameId ;
             var stream = AccrueStream();
-            snapShotLst.Add(stream);
+            snapShotDict[frameId]=stream;
             snapShotWriter.Init(stream);
             for (int i = 0; i < members.Count; i++)
             {
@@ -43,12 +42,12 @@ namespace GameCore
         }
         public void RollBackTo(int frame)
         {
-            if(frame>= snapShotLst.Count)
+            if(!snapShotDict.ContainsKey(frame))
             {
                 Debug.LogError($"Roll Back To {frame} Failed!!");
                 return;
             }
-            var stream = snapShotLst[frame];
+            var stream = snapShotDict[frame];
             stream.Position = 0;
             snapShotReader.Init(stream);
             for (int i = 0; i < members.Count; i++)

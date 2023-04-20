@@ -21,7 +21,6 @@ namespace Server
         protected override void OnReciveMsg(NetMsg msg)
         {
             //todo RecvMsg
-            Utility.Log.Debug($"ReciveMsg:{msg.NetCmd}");
             ModuleManager.Instance.GetModule<ServerMgr>().ReceiveMsg(SessionId, msg);
         }
 

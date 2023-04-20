@@ -16,6 +16,7 @@ namespace GameCore
         public int CFrameId { get; private set; }
 
         protected bool canSendOpKey = false;
+        private bool isClientLogicStart = false;
 
 
         public override void OnUpdate()
@@ -28,7 +29,14 @@ namespace GameCore
         /// <param name="frameStartTime"></param>
         public void StartClientFrame(long frameStartTime)
         {
+            if (isClientLogicStart)
+            {
+                return;
+            }
+            isClientLogicStart = true;
             canSendOpKey = true;
+            //客户端提前3帧开始
+            CFrameId = 3;
             GetModule<TimerManager>().AddMsTickTimerTask(66, ClientLogicTick, null, 0, frameStartTime);
         }
         /// <summary>
@@ -43,24 +51,40 @@ namespace GameCore
             ISyncUnit unit;
             OpKey opKey;
             //检测是否不一致
-            bool isEqual = true;
+            var allSyncUnits = GetModule<GameUnitMgr>().GetAllSyncUnits();
+            var remainSyncUnits = allSyncUnits.Select(t => t.NetUrl).ToList();
+            List<OpKey> differenceOpkeys = new List<OpKey>();
             for (int i = 0; i < msg.OpKeyList.Count; i++)
             {
                 opKey = msg.OpKeyList[i];
+                Debug.LogWarning($"输入指令:{SFrameId},{opKey.PlayerId},{opKey.KeyType}");
                 unit = GetModule<GameUnitMgr>().GetSyncUnit(opKey.PlayerId);
+                remainSyncUnits.Remove(opKey.PlayerId);
                 if (unit != null)
                 {
-                    isEqual &= unit.CheckOutOpKey(SFrameId, opKey);
+                    if(!unit.CheckOutOpKey(SFrameId, opKey))
+                    {
+                        differenceOpkeys.Add(opKey);
+                    }
                 }
                 else
                 {
                     Debug.LogError($"不存在单位{opKey.PlayerId}");
                 }
             }
-            //全部一致，清除所有SyncUnit那一帧的缓存
-            if (isEqual)
+            //没有指令的单位按空指令检测
+            for (int i = 0; i < remainSyncUnits.Count; i++)
             {
-                var allSyncUnits = GetModule<GameUnitMgr>().GetAllSyncUnits();
+                unit = GetModule<GameUnitMgr>().GetSyncUnit(remainSyncUnits[i]);
+                opKey = new OpKey() { KeyType = OpKeyType.None, PlayerId = remainSyncUnits[i] };
+                if(!unit.CheckOutOpKey(SFrameId, opKey))
+                {
+                    differenceOpkeys.Add(opKey);
+                }
+            }
+            //全部一致，清除所有SyncUnit那一帧的缓存
+            if (differenceOpkeys.Count==0)
+            {
                 for (int i = 0; i < allSyncUnits.Count; i++)
                 {
                     allSyncUnits[i].ReleaseOperateInfo(SFrameId);
@@ -69,9 +93,9 @@ namespace GameCore
             //替换消息中玩家的那一帧
             else
             {
-                for (int i = 0; i < msg.OpKeyList.Count; i++)
+                for (int i = 0; i < differenceOpkeys.Count; i++)
                 {
-                    opKey = msg.OpKeyList[i];
+                    opKey = differenceOpkeys[i];
                     unit = GetModule<GameUnitMgr>().GetSyncUnit(opKey.PlayerId);
                     if (unit != null)
                     {
@@ -79,9 +103,10 @@ namespace GameCore
                     }
                 }
                 //回滚到前一帧
+                Debug.LogError($"{CFrameId},RollBackTo:{SFrameId - 1}");
                 GetModule<RollBackMgr>().RollBackTo(SFrameId - 1);
                 //追赶到当前客户端帧
-                ChaseFrame(SFrameId);
+                ChaseFrame(SFrameId, false);
             }
         }
         /// <summary>
@@ -94,6 +119,7 @@ namespace GameCore
                 ReferencePool.Release(operateInfo);
                 return;
             }
+            canSendOpKey = false;
             OpKey opKey = new OpKey();
             if (operateInfo.KeyType == OpKeyType.Move)
             {
@@ -102,12 +128,20 @@ namespace GameCore
                 moveKey.Z_Value = operateInfo.InputDir.z.ScaledValue;
                 opKey.MoveKey = moveKey;
                 opKey.KeyType = OpKeyType.Move;
+                if (operateInfo.InputDir == FXVector3.zero)
+                {
+                    operateInfo.KeyType = OpKeyType.None;
+                }
             }
-            GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SOpKey, new C2SOpKeyMsg() { FrameId = CFrameId, OpKey = opKey });
+            if (operateInfo.KeyType != OpKeyType.None)
+            {
+                GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SOpKey, new C2SOpKeyMsg() { FrameId = CFrameId, OpKey = opKey });
+            }
             GetModule<GameUnitMgr>().MainHero.InputKey(operateInfo);
+            GetModule<GameUnitMgr>().MainHero.CacheOperate(CFrameId,operateInfo);
         }
 
-        private void ChaseFrame(int frameId)
+        private void ChaseFrame(int frameId, bool isForcast)
         {
             //其他玩家操作单位重新预测并输入，本地玩家将旧的操作指令输入
             var mainHero = GetModule<GameUnitMgr>().MainHero;
@@ -117,8 +151,16 @@ namespace GameCore
                 var hero = (heroList[i] as HeroEntity);
                 if (hero.NetUrl != mainHero.NetUrl)
                 {
-                    var operateInfo = hero.ForcastOpkey(frameId);
-                    hero.CacheOperate(frameId, operateInfo);
+                    if (isForcast)
+                    {
+                        var operateInfo = hero.ForcastOpkey(frameId);
+                        hero.CacheOperate(frameId, operateInfo);
+                    }
+                    else
+                    {
+                        var operateInfo = hero.GetOperateInfo(frameId);
+                        hero.InputKey(operateInfo);
+                    }
                 }
                 else
                 {
@@ -127,23 +169,23 @@ namespace GameCore
                 }
             }
 
-            EntityClientLogicTick();
+            EntityClientLogicTick(frameId);
 
-            if (frameId == CFrameId)
+            if (frameId == CFrameId-1)
             {
                 //追赶结束
                 return;
             }
             else
             {
-                ChaseFrame(frameId + 1);
+                ChaseFrame(frameId + 1, true);
             }
         }
 
         //根据玩家的输入和预测运行各个帧同步实体
         private void ClientLogicTick()
         {
-            CFrameId++;
+            //在帧结束的时候执行操作
             canSendOpKey = true;
             GameEvent.LockStep.ClientFrameChange?.Invoke(CFrameId);
             //对可操作单位所有帧同步行为进行预测
@@ -160,20 +202,22 @@ namespace GameCore
                 }
             }
 
-            EntityClientLogicTick();
+            EntityClientLogicTick(CFrameId);
 
-            //逻辑帧结束进行快照
-            GetModule<RollBackMgr>().TakeSnapShot();
+           
+            CFrameId++;
         }
-        private void EntityClientLogicTick()
+        private void EntityClientLogicTick(int frameId)
         {
             var heroList = GetModule<GameUnitMgr>().GetEntitiyByType(EntityType.Hero);
             //所有帧同步单位执行行为
             //1.英雄
             for (int i = 0; i < heroList.Count; i++)
             {
-                (heroList[i] as LogicEntity).ClientLogicTick();
+                (heroList[i] as LogicEntity).ClientLogicTick(frameId);
             }
+            //逻辑帧结束进行快照
+            GetModule<RollBackMgr>().TakeSnapShot(frameId);
         }
 
         //表现层刷新

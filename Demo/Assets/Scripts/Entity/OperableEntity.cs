@@ -25,6 +25,7 @@ namespace GameCore
         {
             localOpDict.TryGetValue(frameId - 1, out var LastOperate);
             var operate = ReferencePool.Accrue<OperateInfo>();
+            operate.FrameId = frameId;
             if (LastOperate == null || LastOperate.KeyType == OpKeyType.None)
             {
                 operate.KeyType = OpKeyType.None;
@@ -47,6 +48,7 @@ namespace GameCore
                     MoveDir = FXVector3.zero;
                     break;
                 case OpKeyType.Move:
+                    Debug.LogError($"InputMove:{operateInfo.FrameId}");
                     MoveDir = operateInfo.InputDir;
                     break;
             }
@@ -54,11 +56,6 @@ namespace GameCore
         //缓存指令
         public void CacheOperate(int frameId, OperateInfo operateInfo)
         {
-            if (localOpDict.ContainsKey(frameId))
-            {
-                Debug.LogError($"重复缓存:{frameId}");
-                return;
-            }
             localOpDict[frameId] = operateInfo;
         }
         /// <summary>
@@ -87,7 +84,7 @@ namespace GameCore
         {
             ReleaseOperateInfo(frameId);
             var operateInfo = ReferencePool.Accrue<OperateInfo>();
-            operateInfo.Init(opKey);
+            operateInfo.Init(frameId,opKey);
             CacheOperate(frameId, operateInfo);
         }
         public OperateInfo GetOperateInfo(int frameId)
@@ -96,6 +93,7 @@ namespace GameCore
             {
                 localOpDict[frameId] = ReferencePool.Accrue<OperateInfo>();
                 localOpDict[frameId].KeyType = OpKeyType.None;
+                localOpDict[frameId].FrameId =frameId;
             }
             return localOpDict[frameId];
         }

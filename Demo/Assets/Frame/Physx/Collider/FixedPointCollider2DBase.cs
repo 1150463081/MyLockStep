@@ -1,6 +1,7 @@
 using System;
 using LockStepFrame;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SimplePhysx
 {
@@ -10,7 +11,7 @@ namespace SimplePhysx
     public abstract class FixedPointCollider2DBase
     {
         public string Name { get; protected set; }
-        public FXVector3 Pos { get; set; }
+        public FXVector3 Pos { get; protected set; }
 
         List<(FXVector3 normal, FXVector3 adjust)> collisionInfos = new List<(FXVector3 normal, FXVector3 adjust)>();
         public void ClacCollison(List<FixedPointCollider2DBase> colliders, ref FXVector3 velocity, ref FXVector3 adjust)
@@ -88,6 +89,12 @@ namespace SimplePhysx
         /// <param name="adjust">位置修正向量</param>
         public abstract bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref FXVector3 normal, ref FXVector3 adjust);
 
+        public void SetPos(FXVector3 pos)
+        {
+            if(pos!=Pos)
+            Debug.LogError($"SetPos:{pos}");
+            Pos = pos;
+        }
         private FXVector3 CorrectVelocity(FXVector3 velocity, FXVector3 normal)
         {
             if (normal == FXVector3.zero)

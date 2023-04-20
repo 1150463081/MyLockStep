@@ -12,7 +12,7 @@ namespace GameCore
         public FXInt MoveSpeed { get; protected set; }
         public BaseVO()
         {
-            MoveSpeed = 2;
+            MoveSpeed = 10;
         }
     }
 }

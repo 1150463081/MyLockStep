@@ -13,6 +13,8 @@ namespace GameCore
         private Text txt_localFrame;
         private Text txt_NetFrame;
         private Text txt_Offest;
+        private Text txt_NetUrl;
+        private Text txt_Pos;
         private InputField inputField;
         private Button btn_rollBack;
 
@@ -28,12 +30,19 @@ namespace GameCore
             txt_Offest = transform.Find("txtOffest").GetComponent<Text>();
             inputField = transform.Find("InputField").GetComponent<InputField>();
             btn_rollBack = transform.Find("btnRollBack").GetComponent<Button>();
+            txt_NetUrl = transform.Find("txtNetUrl").GetComponent<Text>();
+            txt_Pos = transform.Find("txtPos").GetComponent<Text>();
             btn_enterRoom.onClick.AddListener(EnterRoomOnClick);
             inputField.onEndEdit.AddListener(OnEndEdit);
             btn_rollBack.onClick.AddListener(OnRollBackClick);
 
             GameEvent.LockStep.ServerFrameChange += ServerFrameChangeHandler;
             GameEvent.LockStep.ClientFrameChange += ClientFrameChangeHandler;
+            GameEvent.Player.OnMainHeroAdd += OnMainHeroAddHandler;
+        }
+        protected override void OnStart()
+        {
+            GetModule<UpdateMgr>().UpdateEvent += OnUpdateHandler;
         }
 
         private void OnEndEdit(string str)
@@ -70,6 +79,19 @@ namespace GameCore
             txt_localFrame.text = "ClientFrame:" + frame;
             cFrame = frame;
             txt_Offest.text = "Offest:" + (cFrame - sFrame);
+        }
+        private void OnMainHeroAddHandler()
+        {
+            var mainHero = GetModule<GameUnitMgr>().MainHero;
+            txt_NetUrl.text = $"NetUrl:{mainHero.NetUrl}";
+        }
+        private void OnUpdateHandler()
+        {
+            var mainPlayer = GetModule<GameUnitMgr>().MainHero;
+            if (mainPlayer != null)
+            {
+                txt_Pos.text = "Pos:" + mainPlayer.transform.position;
+            }
         }
     }
 }

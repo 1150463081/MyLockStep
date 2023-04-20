@@ -13,5 +13,9 @@ namespace GameCore
             public static Action<int> ClientFrameChange;
             public static Action<int> ServerFrameChange;
         }
+        public class Player
+        {
+            public static Action OnMainHeroAdd;
+        }
     }
 }
