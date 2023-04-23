@@ -48,7 +48,6 @@ namespace GameCore
                     MoveDir = FXVector3.zero;
                     break;
                 case OpKeyType.Move:
-                    Debug.LogError($"InputMove:{operateInfo.FrameId}");
                     MoveDir = operateInfo.InputDir;
                     break;
             }

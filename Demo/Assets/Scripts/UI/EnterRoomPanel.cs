@@ -15,6 +15,7 @@ namespace GameCore
         private Text txt_Offest;
         private Text txt_NetUrl;
         private Text txt_Pos;
+        private Text txt_Delay;
         private InputField inputField;
         private Button btn_rollBack;
 
@@ -32,6 +33,7 @@ namespace GameCore
             btn_rollBack = transform.Find("btnRollBack").GetComponent<Button>();
             txt_NetUrl = transform.Find("txtNetUrl").GetComponent<Text>();
             txt_Pos = transform.Find("txtPos").GetComponent<Text>();
+            txt_Delay = transform.Find("txtDelay").GetComponent<Text>();
             btn_enterRoom.onClick.AddListener(EnterRoomOnClick);
             inputField.onEndEdit.AddListener(OnEndEdit);
             btn_rollBack.onClick.AddListener(OnRollBackClick);
@@ -92,6 +94,7 @@ namespace GameCore
             {
                 txt_Pos.text = "Pos:" + mainPlayer.transform.position;
             }
+            txt_Delay.text = "Delay:" + GetModule<HeartBeatMgr>().NetDelay;
         }
     }
 }

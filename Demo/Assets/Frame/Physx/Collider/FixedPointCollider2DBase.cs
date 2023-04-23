@@ -92,7 +92,6 @@ namespace SimplePhysx
         public void SetPos(FXVector3 pos)
         {
             if(pos!=Pos)
-            Debug.LogError($"SetPos:{pos}");
             Pos = pos;
         }
         private FXVector3 CorrectVelocity(FXVector3 velocity, FXVector3 normal)

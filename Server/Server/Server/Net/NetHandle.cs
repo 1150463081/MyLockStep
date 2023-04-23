@@ -10,7 +10,7 @@ namespace Server
         public abstract NetCmd NetCmd { get; }
         public abstract void Handle(uint sessionId, NetMsg msg);
     }
-    public class C2SEnterBattleRoomHandle : NetHandle
+    public class EnterBattleRoomHandle : NetHandle
     {
 
         public override NetCmd NetCmd => NetCmd.C2SEnterBattleRoom;
@@ -22,7 +22,7 @@ namespace Server
             room.AddPlayer(sessionId);
         }
     }
-    public class C2SOpKeyHandle : NetHandle
+    public class OpKeyHandle : NetHandle
     {
         public override NetCmd NetCmd => NetCmd.C2SOpKey;
 
@@ -31,6 +31,16 @@ namespace Server
             var mMsg = msg as C2SOpKeyMsg;
             var room = BattleRoomMgr.Instance.GetRoomByPlayerId(sessionId);
             room.InputOpKey(mMsg);
+        }
+    }
+    public class HeartBeatHandle : NetHandle
+    {
+        public override NetCmd NetCmd => NetCmd.C2SHeartBeat;
+        public override void Handle(uint sessionId, NetMsg msg)
+        {
+            var mMsg = msg as C2SHeartBeatMsg;
+            var s2cMsg = new S2CHeartBeatMsg() { Index = mMsg.Index, SendTime = mMsg.SendTime };
+            ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(mMsg.SessionId, NetCmd.S2CHeartBeat, s2cMsg);
         }
     }
 }

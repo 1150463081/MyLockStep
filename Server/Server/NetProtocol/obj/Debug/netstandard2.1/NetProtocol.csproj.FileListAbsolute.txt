@@ -10,4 +10,3 @@ E:\UnityProject\MyLockStep\Server\Server\NetProtocol\obj\Debug\netstandard2.1\Ne
 E:\UnityProject\MyLockStep\Server\Server\NetProtocol\obj\Debug\netstandard2.1\NetProtocol.dll
 E:\UnityProject\MyLockStep\Server\Server\NetProtocol\obj\Debug\netstandard2.1\NetProtocol.pdb
 E:\UnityProject\MyLockStep\Server\Server\NetProtocol\bin\Debug\netstandard2.1\Kcp.dll
-E:\UnityProject\MyLockStep\Server\Server\NetProtocol\obj\Debug\netstandard2.1\NetProtocol.csproj.AssemblyReference.cache

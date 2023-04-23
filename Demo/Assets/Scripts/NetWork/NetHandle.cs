@@ -48,4 +48,13 @@ namespace GameCore
             logicTickMgr.CheckOutOpKey(mMsg);
         }
     }
+    public class S2CHeartBeatHandle : NetHandle
+    {
+        public override NetCmd NetCmd => NetCmd.S2CHeartBeat;
+        public override void Handle(NetMsg msg)
+        {
+            var mMsg = msg as S2CHeartBeatMsg;
+            ModuleManager.Instance.GetModule<HeartBeatMgr>().ReciveHeartBeat(mMsg);
+        }
+    }
 }

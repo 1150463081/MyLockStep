@@ -51,13 +51,8 @@ namespace GameCore
         protected void LogicTickMove(int frameId)
         {
             //逻辑位置更新
-            var oldPos = Col.Pos;
             var pos = Col.Pos + MoveDir * BaseVO.MoveSpeed * ((FXInt)0.066f);
             Col.SetPos(pos);
-            if (Col.Pos != oldPos)
-            {
-                Debug.LogError($"LogicTickMove,Frame:{frameId},Pos:{Col.Pos}");
-            }
             //transform.position = Col.Pos.ConvertViewVector3();
         }
         #endregion
@@ -70,7 +65,12 @@ namespace GameCore
         protected void ViewTickMove()
         {
             var tgtPos = Col.Pos.ConvertViewVector3();
-            transform.position = Vector3.Lerp(transform.position, tgtPos, .5f);
+            var offest = tgtPos - transform.position;
+            var dir = offest.normalized;
+            if (MoveDir != FXVector3.zero)
+            {
+                transform.position += dir * BaseVO.MoveSpeed.RawFloat * Time.deltaTime;
+            }
         }
         #endregion
 

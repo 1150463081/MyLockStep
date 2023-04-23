@@ -10,8 +10,9 @@ namespace NetProtocol
         C2SEnterBattleRoom,
         S2CEnterBattleRoom,
         C2SOpKey,
-        S2COpKey
-
+        S2COpKey,
+        C2SHeartBeat,
+        S2CHeartBeat
     }
     [Serializable]
     public class NetMsg : KCPMsg
@@ -19,6 +20,18 @@ namespace NetProtocol
         public uint SessionId;
         public NetCmd NetCmd;
         public long Time;
+    }
+    [Serializable]
+    public class C2SHeartBeatMsg : NetMsg
+    {
+        public int Index;
+        public long SendTime;
+    }
+    [Serializable]
+    public class S2CHeartBeatMsg : NetMsg
+    {
+        public int Index;
+        public long SendTime;
     }
     [Serializable]
     public class S2CEnterBattleRoomMsg : NetMsg
@@ -48,7 +61,7 @@ namespace NetProtocol
         public OpKey OpKey;
     }
     [Serializable]
-    public class OpKey 
+    public class OpKey
     {
         public uint PlayerId;
         public OpKeyType KeyType;

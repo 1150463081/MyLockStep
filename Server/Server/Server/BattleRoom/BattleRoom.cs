@@ -45,7 +45,6 @@ namespace Server
                 opKeyDict[opKey.FrameId] = new List<C2SOpKeyMsg>();
             }
             opKeyDict[opKey.FrameId].Add(opKey);
-            Utility.Log.Debug($"ReciveMsg:{opKey.FrameId},{frameIdx}");
         }
         private void TickLogicFrame()
         {
