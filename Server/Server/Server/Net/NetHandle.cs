@@ -39,7 +39,9 @@ namespace Server
         public override void Handle(uint sessionId, NetMsg msg)
         {
             var mMsg = msg as C2SHeartBeatMsg;
-            var s2cMsg = new S2CHeartBeatMsg() { Index = mMsg.Index, SendTime = mMsg.SendTime };
+            var s2cMsg = ProtoPool.Accrue<S2CHeartBeatMsg>();
+            s2cMsg.Index = mMsg.Index;
+            s2cMsg.SendTime = mMsg.SendTime;
             ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(mMsg.SessionId, NetCmd.S2CHeartBeat, s2cMsg);
         }
     }

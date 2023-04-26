@@ -12,11 +12,14 @@ namespace GameCore
     [Module]
     public class LogicTickMgr : Module
     {
+        public const int LogicTickInerval = 66;
         public int SFrameId { get; private set; }
         public int CFrameId { get; private set; }
 
         protected bool canSendOpKey = false;
         private bool isClientLogicStart = false;
+        //客户端领先服务器的帧数，可动态变化
+        private int aheadFrame = 3;
 
 
         public override void OnUpdate()
@@ -37,7 +40,7 @@ namespace GameCore
             canSendOpKey = true;
             //客户端提前3帧开始
             CFrameId = 3;
-            GetModule<TimerManager>().AddMsTickTimerTask(66, ClientLogicTick, null, 0, frameStartTime);
+            GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, ClientLogicTick, null, 0, frameStartTime);
         }
         /// <summary>
         /// 收到服务器帧消息并进行校验

@@ -33,6 +33,7 @@ namespace Server
         {
             msg.NetCmd = cmd;
             server.SendMsg(sessionId, msg);
+            ProtoPool.Release(msg);
         }
         public void SendMsg(IList<uint> sessionIds, NetCmd cmd, NetMsg msg)
         {

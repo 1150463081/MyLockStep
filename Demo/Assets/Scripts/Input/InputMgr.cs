@@ -18,14 +18,6 @@ namespace GameCore
         {
             float x = Input.GetAxis("Horizontal");
             float z = Input.GetAxis("Vertical");
-            //if (x != 0 || z != 0)
-            //{
-            //    InputMoveKey(x, z);
-            //}
-            //else if (x != lastX || z != lastZ)
-            //{
-            //    InputMoveKey(x, z);
-            //}
             InputMoveKey(x, z);
             lastX = x;
             lastZ = z;

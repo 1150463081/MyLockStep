@@ -65,11 +65,20 @@ namespace GameCore
         protected void ViewTickMove()
         {
             var tgtPos = Col.Pos.ConvertViewVector3();
-            var offest = tgtPos - transform.position;
-            var dir = offest.normalized;
-            if (MoveDir != FXVector3.zero)
+            if (tgtPos == transform.position)
             {
-                transform.position += dir * BaseVO.MoveSpeed.RawFloat * Time.deltaTime;
+                return;
+            }
+            var offest = tgtPos - transform.position;
+            var moveDir = offest.normalized;
+            var moveDis = moveDir * BaseVO.MoveSpeed.RawFloat * Time.deltaTime;
+            if (moveDis.magnitude > offest.magnitude)
+            {
+                transform.position = tgtPos;
+            }
+            else
+            {
+                transform.position += moveDis;
             }
         }
         #endregion

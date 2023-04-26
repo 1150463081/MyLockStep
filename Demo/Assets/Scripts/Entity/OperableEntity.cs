@@ -48,7 +48,7 @@ namespace GameCore
                     MoveDir = FXVector3.zero;
                     break;
                 case OpKeyType.Move:
-                    MoveDir = operateInfo.InputDir;
+                    MoveDir = operateInfo.InputDir.normalized;
                     break;
             }
         }

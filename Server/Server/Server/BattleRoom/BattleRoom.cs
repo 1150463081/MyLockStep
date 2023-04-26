@@ -35,8 +35,10 @@ namespace Server
             playerDict[sessionId] = player;
 
             BattleRoomMgr.Instance.RegisterPlayer(sessionId, this);
-
-            ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2CEnterBattleRoom, new S2CEnterBattleRoomMsg() { FrameStartTime = frameStartTime, PlayerId = allPlayerId });
+            var msg = ProtoPool.Accrue<S2CEnterBattleRoomMsg>();
+            msg.FrameStartTime = frameStartTime;
+            msg.PlayerId = allPlayerId;
+            ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2CEnterBattleRoom, msg);
         }
         public void InputOpKey(C2SOpKeyMsg opKey)
         {
@@ -49,24 +51,23 @@ namespace Server
         private void TickLogicFrame()
         {
             frameIdx++;
-            S2COpKeyMsg msg = new S2COpKeyMsg()
-            {
-                FrameId = frameIdx,
-                OpKeyList = new List<OpKey>()
-            };
+
+            var msg = ProtoPool.Accrue<S2COpKeyMsg>();
+            msg.FrameId = frameIdx;
+            msg.OpKeyList = new List<OpKey>();
             opKeyDict.TryGetValue(frameIdx, out var opKeyList);
 
             if (opKeyList!=null&&opKeyList.Count > 0)
             {
                 for (int i = 0; i < opKeyList.Count; i++)
                 {
-                    var opkey = new OpKey()
-                    {
-                        PlayerId = opKeyList[i].SessionId,
-                        MoveKey = opKeyList[i].OpKey.MoveKey,
-                        KeyType = opKeyList[i].OpKey.KeyType
-                    };
-                    msg.OpKeyList.Add(opkey);
+                    var opKey = ProtoPool.Accrue<OpKey>();
+                    opKey.PlayerId = opKeyList[i].SessionId;
+                    opKey.KeyType = opKeyList[i].OpKey.KeyType;
+                    opKey.MoveKey = ProtoPool.Accrue<MoveKey>();
+                    opKey.MoveKey.X_Value = opKeyList[i].OpKey.MoveKey.X_Value;
+                    opKey.MoveKey.Z_Value = opKeyList[i].OpKey.MoveKey.Z_Value;
+                    msg.OpKeyList.Add(opKey);
                 }
             }
 
