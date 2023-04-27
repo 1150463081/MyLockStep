@@ -16,27 +16,34 @@ namespace GameCore
         private Text txt_NetUrl;
         private Text txt_Pos;
         private Text txt_Delay;
-        private InputField inputField;
+        private InputField input_RollBack;
         private Button btn_rollBack;
+        private InputField input_ChangeAheadFrame;
+        private Button btn_ChangeAheadFrame;
 
         private int sFrame;
         private int cFrame;
 
         private int rollBackFrame;
+        private int aheadFrame;
         protected override void OnInit()
         {
             btn_enterRoom = transform.Find("btnEnterRoom").GetComponent<Button>();
             txt_localFrame = transform.Find("txtLocalFrame").GetComponent<Text>();
             txt_NetFrame = transform.Find("txtNetFrame").GetComponent<Text>();
             txt_Offest = transform.Find("txtOffest").GetComponent<Text>();
-            inputField = transform.Find("InputField").GetComponent<InputField>();
+            input_RollBack = transform.Find("InputField").GetComponent<InputField>();
             btn_rollBack = transform.Find("btnRollBack").GetComponent<Button>();
             txt_NetUrl = transform.Find("txtNetUrl").GetComponent<Text>();
             txt_Pos = transform.Find("txtPos").GetComponent<Text>();
             txt_Delay = transform.Find("txtDelay").GetComponent<Text>();
+            input_ChangeAheadFrame = transform.Find("input_ChangeAheadFrame").GetComponent<InputField>();
+            btn_ChangeAheadFrame = transform.Find("btn_ChangeAheadFrame").GetComponent<Button>();
             btn_enterRoom.onClick.AddListener(EnterRoomOnClick);
-            inputField.onEndEdit.AddListener(OnEndEdit);
+            input_RollBack.onEndEdit.AddListener(OnEndEdit);
             btn_rollBack.onClick.AddListener(OnRollBackClick);
+            input_ChangeAheadFrame.onEndEdit.AddListener(OnChangeAheadFrameEndEdit);
+            btn_ChangeAheadFrame.onClick.AddListener(OnChangeAheadFrameClick);
 
             GameEvent.LockStep.ServerFrameChange += ServerFrameChangeHandler;
             GameEvent.LockStep.ClientFrameChange += ClientFrameChangeHandler;
@@ -59,12 +66,32 @@ namespace GameCore
             }
             else
             {
-                inputField.text = string.Empty;
+                input_RollBack.text = string.Empty;
             }
         }
+
         private void OnRollBackClick()
         {
             GetModule<RollBackMgr>().RollBackTo(rollBackFrame);
+        }
+        private void OnChangeAheadFrameEndEdit(string str)
+        {
+            if (string.IsNullOrWhiteSpace(str))
+            {
+                return;
+            }
+            if (int.TryParse(str, out var value))
+            {
+                aheadFrame = value;
+            }
+            else
+            {
+                input_ChangeAheadFrame.text = string.Empty;
+            }
+        }
+        private void OnChangeAheadFrameClick()
+        {
+            GetModule<LogicTickMgr>().ChangeAheadFrame(aheadFrame);
         }
         private void EnterRoomOnClick()
         {

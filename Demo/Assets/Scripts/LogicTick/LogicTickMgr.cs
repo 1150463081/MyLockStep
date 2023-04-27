@@ -13,13 +13,20 @@ namespace GameCore
     public class LogicTickMgr : Module
     {
         public const int LogicTickInerval = 66;
+        public const int MaxAheadFrame = 10;
+        public const int MinAheadFrame = 2;
         public int SFrameId { get; private set; }
         public int CFrameId { get; private set; }
+        //开始计时后固定频率更新的帧数，作为本地客户端帧速率变化的参考
+        public int RealFrameId { get; private set; }
 
         protected bool canSendOpKey = false;
         private bool isClientLogicStart = false;
         //客户端领先服务器的帧数，可动态变化
-        private int aheadFrame = 3;
+        private int m_aheadFrame = 3;
+        private int m_clientTickTimerId;
+        private int m_realTickTimerId;
+        private bool isChangeInterval = false;
 
 
         public override void OnUpdate()
@@ -40,7 +47,8 @@ namespace GameCore
             canSendOpKey = true;
             //客户端提前3帧开始
             CFrameId = 3;
-            GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, ClientLogicTick, null, 0, frameStartTime);
+            m_clientTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, ClientLogicTick, null, 0, frameStartTime);
+            m_realTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, RealLogicTick, null, 0, frameStartTime);
         }
         /// <summary>
         /// 收到服务器帧消息并进行校验
@@ -64,7 +72,7 @@ namespace GameCore
                 remainSyncUnits.Remove(opKey.PlayerId);
                 if (unit != null)
                 {
-                    if(!unit.CheckOutOpKey(SFrameId, opKey))
+                    if (!unit.CheckOutOpKey(SFrameId, opKey))
                     {
                         differenceOpkeys.Add(opKey);
                     }
@@ -79,13 +87,13 @@ namespace GameCore
             {
                 unit = GetModule<GameUnitMgr>().GetSyncUnit(remainSyncUnits[i]);
                 opKey = new OpKey() { KeyType = OpKeyType.None, PlayerId = remainSyncUnits[i] };
-                if(!unit.CheckOutOpKey(SFrameId, opKey))
+                if (!unit.CheckOutOpKey(SFrameId, opKey))
                 {
                     differenceOpkeys.Add(opKey);
                 }
             }
             //全部一致，清除所有SyncUnit那一帧的缓存
-            if (differenceOpkeys.Count==0)
+            if (differenceOpkeys.Count == 0)
             {
                 for (int i = 0; i < allSyncUnits.Count; i++)
                 {
@@ -140,7 +148,31 @@ namespace GameCore
                 GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SOpKey, new C2SOpKeyMsg() { FrameId = CFrameId, OpKey = opKey });
             }
             GetModule<GameUnitMgr>().MainHero.InputKey(operateInfo);
-            GetModule<GameUnitMgr>().MainHero.CacheOperate(CFrameId,operateInfo);
+            GetModule<GameUnitMgr>().MainHero.CacheOperate(CFrameId, operateInfo);
+        }
+        public void ChangeAheadFrame(int aheadFrame)
+        {
+            //本地必须领先服务器
+            if (aheadFrame <= 0 || aheadFrame == m_aheadFrame)
+            {
+                return;
+            }
+            isChangeInterval = true;
+            //计算加速时每帧间隔
+            var offsetFrame = m_aheadFrame - aheadFrame;
+            //每差x帧缩放x的0.5次方+1倍数
+            int mult = (int)(Math.Pow(Math.Abs(offsetFrame), 0.5) + 1);
+            int interval = LogicTickInerval;
+            if (offsetFrame < 0)
+            {
+                interval /= mult;
+            }
+            else
+            {
+                interval *= mult;
+            }
+            m_aheadFrame = aheadFrame;
+            GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, interval);
         }
 
         private void ChaseFrame(int frameId, bool isForcast)
@@ -173,7 +205,7 @@ namespace GameCore
 
             EntityClientLogicTick(frameId);
 
-            if (frameId == CFrameId-1)
+            if (frameId == CFrameId - 1)
             {
                 //追赶结束
                 return;
@@ -206,8 +238,15 @@ namespace GameCore
 
             EntityClientLogicTick(CFrameId);
 
-           
+
             CFrameId++;
+            //速率变动结束
+            if (RealFrameId + m_aheadFrame == CFrameId&& isChangeInterval)
+            {
+                Debug.Log("速率变动结束");
+                isChangeInterval = false;
+                GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, LogicTickInerval);
+            }
         }
         private void EntityClientLogicTick(int frameId)
         {
@@ -220,6 +259,11 @@ namespace GameCore
             }
             //逻辑帧结束进行快照
             GetModule<RollBackMgr>().TakeSnapShot(frameId);
+        }
+
+        private void RealLogicTick()
+        {
+            RealFrameId++;
         }
 
         //表现层刷新

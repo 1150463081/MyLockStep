@@ -29,6 +29,10 @@ namespace LockStepFrame
         {
             return msTickTimer.AddTask(delay, callEvt, cancelEvt, loopCnt, startTime);
         }
+        public void ChangeMsTickTimerTaskInterval(int taskId,int interval)
+        {
+            msTickTimer.ChangeInterval(taskId, interval);
+        }
 
     }
 }

@@ -28,7 +28,7 @@ namespace LockStepFrame
                 long destTime;
                 if (nowTime > startTime)
                 {
-                    destTime = startTime+delay;
+                    destTime = startTime + delay;
                     task = new TickTask(tId, delay, destTime, callEvt, cancelEvt, loopCnt);
                     while (task.DestTime < nowTime)
                     {
@@ -40,7 +40,7 @@ namespace LockStepFrame
                     destTime = startTime + delay;
                     task = new TickTask(tId, delay, destTime, callEvt, cancelEvt, loopCnt);
                 }
-                
+
             }
             taskDict[tId] = task;
             return tId;
@@ -69,6 +69,17 @@ namespace LockStepFrame
                 Debug.LogError($"Not Exist MsTickTask {taskId}");
             }
         }
+        public void ChangeInterval(int taskId, int interval)
+        {
+            if (taskDict.ContainsKey(taskId))
+            {
+                taskDict[taskId].ChangeInterval(interval);
+            }
+            else
+            {
+                Debug.LogError($"Not Exist MsTickTask {taskId}");
+            }
+        }
 
         private int GenerateTaskId()
         {
@@ -81,7 +92,7 @@ namespace LockStepFrame
         private class TickTask
         {
             public int Id;
-            public int Delay;
+            public int Interval;
             public double DestTime;
             public Action CallEvt;
             public Action CancelEvt;
@@ -90,10 +101,10 @@ namespace LockStepFrame
             public bool IsLoop => LoopCnt <= 0;
             public bool IsOver;
 
-            public TickTask(int id, int delay, double destTime, Action callEvt, Action cancelEvt, int loopCnt)
+            public TickTask(int id, int interval, double destTime, Action callEvt, Action cancelEvt, int loopCnt)
             {
                 Id = id;
-                Delay = delay;
+                Interval = interval;
                 DestTime = destTime;
                 CallEvt = callEvt;
                 CancelEvt = cancelEvt;
@@ -111,13 +122,23 @@ namespace LockStepFrame
                 if (LoopIndex <= LoopCnt || IsLoop)
                 {
                     CallEvt?.Invoke();
-                    DestTime += Delay;
+                    DestTime += Interval;
                 }
                 if (LoopIndex >= LoopCnt && !IsLoop)
                 {
                     //计时循环结束
                     IsOver = true;
                 }
+            }
+            public void ChangeInterval(int interval)
+            {
+                if (Interval == interval)
+                {
+                    return;
+                }
+                DestTime -= Interval;
+                Interval = interval;
+                DestTime += Interval;
             }
         }
     }
