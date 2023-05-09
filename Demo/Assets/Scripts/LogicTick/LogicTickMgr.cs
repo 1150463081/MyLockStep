@@ -26,7 +26,10 @@ namespace GameCore
         private int m_aheadFrame = 3;
         private int m_clientTickTimerId;
         private int m_realTickTimerId;
-        private bool isChangeInterval = false;
+        private bool isExpandInterval = false;
+        private bool isReduceInterval = false;
+        private int speedChangeTgtFrame = 0;
+        private int speedChangeIndex = 0;
 
 
         public override void OnUpdate()
@@ -157,22 +160,28 @@ namespace GameCore
             {
                 return;
             }
-            isChangeInterval = true;
-            //计算加速时每帧间隔
-            var offsetFrame = m_aheadFrame - aheadFrame;
-            //每差x帧缩放x的0.5次方+1倍数
-            int mult = (int)(Math.Pow(Math.Abs(offsetFrame), 0.5) + 1);
-            int interval = LogicTickInerval;
-            if (offsetFrame < 0)
+
+            if (aheadFrame > m_aheadFrame)
             {
-                interval /= mult;
+                //加快客户端逻辑帧运行速率
+                isExpandInterval = true;
+                //计算加速时每帧间隔
+                var offsetFrame = Mathf.Abs(m_aheadFrame - aheadFrame);
+                //变速需在n个真实帧内完成
+                int n = 1;
+                int interval = LogicTickInerval * n / (offsetFrame + n);
+                speedChangeTgtFrame = RealFrameId + n + aheadFrame;
+
+                GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, interval);
             }
             else
             {
-                interval *= mult;
+                //暂停客户端逻辑帧运行
+                isReduceInterval = true;
+                GetModule<TimerManager>().Pause(m_clientTickTimerId);
             }
             m_aheadFrame = aheadFrame;
-            GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, interval);
+
         }
 
         private void ChaseFrame(int frameId, bool isForcast)
@@ -219,6 +228,8 @@ namespace GameCore
         //根据玩家的输入和预测运行各个帧同步实体
         private void ClientLogicTick()
         {
+            CFrameId++;
+
             //在帧结束的时候执行操作
             canSendOpKey = true;
             GameEvent.LockStep.ClientFrameChange?.Invoke(CFrameId);
@@ -238,13 +249,10 @@ namespace GameCore
 
             EntityClientLogicTick(CFrameId);
 
-
-            CFrameId++;
-            //速率变动结束
-            if (RealFrameId + m_aheadFrame == CFrameId&& isChangeInterval)
+            if (speedChangeTgtFrame == CFrameId && isExpandInterval)
             {
                 Debug.Log("速率变动结束");
-                isChangeInterval = false;
+                isExpandInterval = false;
                 GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, LogicTickInerval);
             }
         }
@@ -264,6 +272,24 @@ namespace GameCore
         private void RealLogicTick()
         {
             RealFrameId++;
+
+            GameEvent.LockStep.RealFrameChange?.Invoke(RealFrameId);
+
+            ////结束会导致客户端逻辑帧变速时回退过久，执行多次
+            //if (RealFrameId + m_aheadFrame == CFrameId && isChangeInterval)
+            //{
+            //    Debug.Log("速率变动结束");
+            //    isChangeInterval = false;
+            //    GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, LogicTickInerval);
+            //    logInfo2 = true;
+            //    endframe1 = RealFrameId;
+            //}
+            if (RealFrameId + m_aheadFrame == CFrameId && isReduceInterval)
+            {
+                Debug.Log("暂停结束");
+                isReduceInterval = false;
+                GetModule<TimerManager>().Continue(m_clientTickTimerId);
+            }
         }
 
         //表现层刷新

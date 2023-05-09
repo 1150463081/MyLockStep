@@ -33,6 +33,14 @@ namespace LockStepFrame
         {
             msTickTimer.ChangeInterval(taskId, interval);
         }
+        public void Pause(int taskId)
+        {
+            msTickTimer.PauseTask(taskId);
+        }
+        public void Continue(int taskId)
+        {
+            msTickTimer.ContinueTask(taskId);
+        }
 
     }
 }

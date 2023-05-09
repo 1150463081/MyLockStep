@@ -69,6 +69,20 @@ namespace LockStepFrame
                 Debug.LogError($"Not Exist MsTickTask {taskId}");
             }
         }
+        public void PauseTask(int taskId)
+        {
+            if (taskDict.ContainsKey(taskId))
+            {
+                taskDict[taskId].Pause();
+            }
+        }
+        public void ContinueTask(int taskId)
+        {
+            if (taskDict.ContainsKey(taskId))
+            {
+                taskDict[taskId].Continue();
+            }
+        }
         public void ChangeInterval(int taskId, int interval)
         {
             if (taskDict.ContainsKey(taskId))
@@ -100,6 +114,8 @@ namespace LockStepFrame
             public int LoopIndex;
             public bool IsLoop => LoopCnt <= 0;
             public bool IsOver;
+            public bool IsPause;
+            public long lastTime;
 
             public TickTask(int id, int interval, double destTime, Action callEvt, Action cancelEvt, int loopCnt)
             {
@@ -114,21 +130,43 @@ namespace LockStepFrame
             }
             public void Tick(long nowTime)
             {
+                var delta = nowTime - lastTime;
+                lastTime = nowTime;
+                if (IsPause)
+                {
+                    DestTime += delta;
+                    return;
+                }
                 if (IsOver || nowTime < DestTime)
                 {
                     return;
                 }
                 LoopIndex++;
-                if (LoopIndex <= LoopCnt || IsLoop)
+                while (nowTime >= DestTime)
                 {
-                    CallEvt?.Invoke();
-                    DestTime += Interval;
+                    if (LoopIndex <= LoopCnt || IsLoop)
+                    {
+                        DestTime += Interval;
+                        CallEvt?.Invoke();
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
                 if (LoopIndex >= LoopCnt && !IsLoop)
                 {
                     //计时循环结束
                     IsOver = true;
                 }
+            }
+            public void Pause()
+            {
+                IsPause = true;
+            }
+            public void Continue()
+            {
+                IsPause = false;
             }
             public void ChangeInterval(int interval)
             {

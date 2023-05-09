@@ -12,6 +12,7 @@ namespace GameCore
         private Button btn_enterRoom;
         private Text txt_localFrame;
         private Text txt_NetFrame;
+        private Text txt_RealFrame;
         private Text txt_Offest;
         private Text txt_NetUrl;
         private Text txt_Pos;
@@ -23,6 +24,7 @@ namespace GameCore
 
         private int sFrame;
         private int cFrame;
+        private int rFrame;
 
         private int rollBackFrame;
         private int aheadFrame;
@@ -31,6 +33,7 @@ namespace GameCore
             btn_enterRoom = transform.Find("btnEnterRoom").GetComponent<Button>();
             txt_localFrame = transform.Find("txtLocalFrame").GetComponent<Text>();
             txt_NetFrame = transform.Find("txtNetFrame").GetComponent<Text>();
+            txt_RealFrame = transform.Find("txtRealFrame").GetComponent<Text>();
             txt_Offest = transform.Find("txtOffest").GetComponent<Text>();
             input_RollBack = transform.Find("InputField").GetComponent<InputField>();
             btn_rollBack = transform.Find("btnRollBack").GetComponent<Button>();
@@ -47,6 +50,7 @@ namespace GameCore
 
             GameEvent.LockStep.ServerFrameChange += ServerFrameChangeHandler;
             GameEvent.LockStep.ClientFrameChange += ClientFrameChangeHandler;
+            GameEvent.LockStep.RealFrameChange += RealFrameChangeHandler;
             GameEvent.Player.OnMainHeroAdd += OnMainHeroAddHandler;
         }
         protected override void OnStart()
@@ -101,13 +105,19 @@ namespace GameCore
         {
             txt_NetFrame.text = "ServerFrame:" + frame;
             sFrame = frame;
-            txt_Offest.text = "Offest:" + (cFrame - sFrame);
+            txt_Offest.text = "Offest:" + (cFrame - sFrame) + ";" + (cFrame - rFrame);
         }
         private void ClientFrameChangeHandler(int frame)
         {
             txt_localFrame.text = "ClientFrame:" + frame;
             cFrame = frame;
-            txt_Offest.text = "Offest:" + (cFrame - sFrame);
+            txt_Offest.text = "Offest:" + (cFrame - sFrame) + ";" + (cFrame - rFrame);
+        }
+        private void RealFrameChangeHandler(int frame)
+        {
+            txt_RealFrame.text = "RealFrame:" + frame;
+            rFrame = frame;
+            txt_Offest.text = "Offest:" + (cFrame - sFrame) + ";" + (cFrame - rFrame);
         }
         private void OnMainHeroAddHandler()
         {

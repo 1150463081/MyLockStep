@@ -12,6 +12,7 @@ namespace GameCore
         {
             public static Action<int> ClientFrameChange;
             public static Action<int> ServerFrameChange;
+            public static Action<int> RealFrameChange;
         }
         public class Player
         {
