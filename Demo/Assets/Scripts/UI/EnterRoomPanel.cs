@@ -131,7 +131,7 @@ namespace GameCore
             {
                 txt_Pos.text = "Pos:" + mainPlayer.transform.position;
             }
-            txt_Delay.text = "Delay:" + GetModule<HeartBeatMgr>().NetDelay;
+            txt_Delay.text = "Delay:" + GetModule<HeartBeatMgr>().NetDelay+"-----"+ GetModule<HeartBeatMgr>().DelayInfo;
         }
     }
 }

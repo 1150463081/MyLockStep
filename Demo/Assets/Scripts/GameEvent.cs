@@ -10,6 +10,7 @@ namespace GameCore
     {
         public class LockStep
         {
+            public static Action<int> ClientLogicTickOver;
             public static Action<int> ClientFrameChange;
             public static Action<int> ServerFrameChange;
             public static Action<int> RealFrameChange;

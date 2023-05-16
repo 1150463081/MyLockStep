@@ -12,7 +12,8 @@ namespace Server
 
         private List<uint> allPlayerId = new List<uint>();
         private Dictionary<uint, BattlePlayer> playerDict = new Dictionary<uint, BattlePlayer>();
-        private Dictionary<int, List<C2SOpKeyMsg>> opKeyDict = new Dictionary<int, List<C2SOpKeyMsg>>();
+        private Dictionary<int, List<C2SOpKeyMsg>> opKeyMsgDict = new Dictionary<int, List<C2SOpKeyMsg>>();
+        private Dictionary<int, List<OpKey>> opKeyDict = new Dictionary<int, List<OpKey>>();
         private int frameIdx;
         private long frameStartTime;
         public void Init(int roomId)
@@ -38,15 +39,40 @@ namespace Server
             var msg = ProtoPool.Accrue<S2CEnterBattleRoomMsg>();
             msg.FrameStartTime = frameStartTime;
             msg.PlayerId = allPlayerId;
+            msg.opKeyQueue = new Queue<List<OpKey>>();
+            msg.StartFrame = 0;
+            msg.NowFrame = frameIdx;
+            int startFrame = msg.StartFrame;
+            while (startFrame < frameIdx)
+            {
+                if (opKeyDict.ContainsKey(startFrame))
+                {
+                    msg.opKeyQueue.Enqueue(opKeyDict[startFrame]);
+                }
+                else
+                {
+                    msg.opKeyQueue.Enqueue(null);
+                }
+                startFrame++;
+            }
             ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(allPlayerId, NetCmd.S2CEnterBattleRoom, msg);
         }
         public void InputOpKey(C2SOpKeyMsg opKey)
         {
+            if (opKey.FrameId < frameIdx)
+            {
+                return;
+            }
+            if (!opKeyMsgDict.ContainsKey(opKey.FrameId))
+            {
+                opKeyMsgDict[opKey.FrameId] = new List<C2SOpKeyMsg>();
+            }
             if (!opKeyDict.ContainsKey(opKey.FrameId))
             {
-                opKeyDict[opKey.FrameId] = new List<C2SOpKeyMsg>();
+                opKeyDict[opKey.FrameId] = new List<OpKey>();
             }
-            opKeyDict[opKey.FrameId].Add(opKey);
+            opKeyMsgDict[opKey.FrameId].Add(opKey);
+            opKeyDict[opKey.FrameId].Add(opKey.OpKey);
         }
         private void TickLogicFrame()
         {
@@ -55,9 +81,9 @@ namespace Server
             var msg = ProtoPool.Accrue<S2COpKeyMsg>();
             msg.FrameId = frameIdx;
             msg.OpKeyList = new List<OpKey>();
-            opKeyDict.TryGetValue(frameIdx, out var opKeyList);
+            opKeyMsgDict.TryGetValue(frameIdx, out var opKeyList);
 
-            if (opKeyList!=null&&opKeyList.Count > 0)
+            if (opKeyList != null && opKeyList.Count > 0)
             {
                 for (int i = 0; i < opKeyList.Count; i++)
                 {

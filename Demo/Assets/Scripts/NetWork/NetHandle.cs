@@ -24,6 +24,7 @@ namespace GameCore
             var netWorkMgr = ModuleManager.Instance.GetModule<NetWorkMgr>();
             var logictickMgr = ModuleManager.Instance.GetModule<LogicTickMgr>();
             var gameUnitMgr = ModuleManager.Instance.GetModule<GameUnitMgr>();
+            //创建角色
             for (int i = 0; i < mMsg.PlayerId.Count; i++)
             {
                 if (gameUnitMgr.HasSyncUnit(mMsg.PlayerId[i]))
@@ -33,8 +34,7 @@ namespace GameCore
                 gameUnitMgr.AddHero(netWorkMgr.SessionId == mMsg.PlayerId[i], mMsg.PlayerId[i]);
 
             }
-            logictickMgr.StartClientFrame(mMsg.FrameStartTime);
-
+            logictickMgr.StartClientFrame(mMsg);
         }
     }
     public class S2COpKeyHandle : NetHandle
@@ -45,7 +45,7 @@ namespace GameCore
         {
             var mMsg = msg as S2COpKeyMsg;
             var logicTickMgr = ModuleManager.Instance.GetModule<LogicTickMgr>();
-            logicTickMgr.CheckOutOpKey(mMsg);
+            logicTickMgr.InputOpKey(mMsg);
         }
     }
     public class S2CHeartBeatHandle : NetHandle

@@ -33,24 +33,26 @@ namespace NetProtocol
     public class C2SHeartBeatMsg : NetMsg
     {
         public int Index;
-        public long SendTime;
+        public long ClientSendTime;
         public override void Clear()
         {
             base.Clear();
             Index = 0;
-            SendTime = 0;
+            ClientSendTime = 0;
         }
     }
     [Serializable]
     public class S2CHeartBeatMsg : NetMsg
     {
         public int Index;
-        public long SendTime;
+        public long ClientSendTime;
+        public long ServerSendTime;
         public override void Clear()
         {
             base.Clear();
             Index = 0;
-            SendTime = 0;
+            ClientSendTime = 0;
+            ServerSendTime = 0;
         }
     }
     [Serializable]
@@ -62,6 +64,14 @@ namespace NetProtocol
         /// 房间的玩家
         /// </summary>
         public List<uint> PlayerId;
+
+        //起始帧
+        public int StartFrame;
+        //房间开始到现在的操作帧记录
+        public Queue<List<OpKey>> opKeyQueue = new Queue<List<OpKey>>();
+        //服务器当前帧
+        public int NowFrame;
+
         public override void Clear()
         {
             base.Clear();

@@ -19,6 +19,8 @@ namespace GameCore
         public int CFrameId { get; private set; }
         //开始计时后固定频率更新的帧数，作为本地客户端帧速率变化的参考
         public int RealFrameId { get; private set; }
+        //逻辑速度，随逻辑帧间隔变化而变化
+        public float LogicSpeed { get; private set; } = 1;
 
         protected bool canSendOpKey = false;
         private bool isClientLogicStart = false;
@@ -29,8 +31,11 @@ namespace GameCore
         private bool isExpandInterval = false;
         private bool isReduceInterval = false;
         private int speedChangeTgtFrame = 0;
-        private int speedChangeIndex = 0;
+        //本地是否加速执行服务器发来的缓存帧数据
+        private bool isSpeedUp = false;
 
+
+        private Queue<List<OpKey>> CacheOpKeyQueue = new Queue<List<OpKey>>();
 
         public override void OnUpdate()
         {
@@ -40,18 +45,52 @@ namespace GameCore
         /// 开始客户端逻辑帧轮询
         /// </summary>
         /// <param name="frameStartTime"></param>
-        public void StartClientFrame(long frameStartTime)
+        public void StartClientFrame(S2CEnterBattleRoomMsg msg)
         {
             if (isClientLogicStart)
             {
                 return;
             }
+            Debug.Log($"StartClientFrame,RealFrameId:{msg.NowFrame}");
             isClientLogicStart = true;
             canSendOpKey = true;
             //客户端提前3帧开始
-            CFrameId = 3;
-            m_clientTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, ClientLogicTick, null, 0, frameStartTime);
-            m_realTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, RealLogicTick, null, 0, frameStartTime);
+            m_aheadFrame = 3;
+
+            RealFrameId = 0;
+            //服务器有发过来缓存的消息，先加速执行，再进行正常逻辑
+            if (msg.opKeyQueue.Count > 0)
+            {
+                CFrameId = msg.StartFrame - 1;
+                isSpeedUp = true;
+                while (msg.opKeyQueue.Count > 0)
+                {
+                    CacheOpKeyQueue.Enqueue(msg.opKeyQueue.Dequeue());
+                }
+                int speed = 4;
+                int interval = LogicTickInerval / speed;
+                LogicSpeed = speed;
+                m_clientTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(interval, ClientLogicTick, null, 0);
+            }
+            else
+            {
+                CFrameId = m_aheadFrame;
+                m_clientTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, ClientLogicTick, null, 0, msg.FrameStartTime);
+            }
+            m_realTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(LogicTickInerval, RealLogicTick, null, 0, msg.FrameStartTime);
+        }
+        public void InputOpKey(S2COpKeyMsg msg)
+        {
+            SFrameId = msg.FrameId;
+            GameEvent.LockStep.ServerFrameChange?.Invoke(SFrameId);
+            if (isSpeedUp)
+            {
+                CacheOpKeyQueue.Enqueue(msg.OpKeyList);
+            }
+            else
+            {
+                CheckOutOpKey(msg);
+            }
         }
         /// <summary>
         /// 收到服务器帧消息并进行校验
@@ -60,8 +99,7 @@ namespace GameCore
         /// <param name="msg"></param>
         public void CheckOutOpKey(S2COpKeyMsg msg)
         {
-            SFrameId = msg.FrameId;
-            GameEvent.LockStep.ServerFrameChange?.Invoke(SFrameId);
+
             ISyncUnit unit;
             OpKey opKey;
             //检测是否不一致
@@ -133,7 +171,7 @@ namespace GameCore
                 return;
             }
             canSendOpKey = false;
-            OpKey opKey = new OpKey();
+            OpKey opKey = new OpKey() { PlayerId = GetModule<GameUnitMgr>().MainHero.NetUrl };
             if (operateInfo.KeyType == OpKeyType.Move)
             {
                 MoveKey moveKey = new MoveKey();
@@ -171,6 +209,8 @@ namespace GameCore
                 int n = 1;
                 int interval = LogicTickInerval * n / (offsetFrame + n);
                 speedChangeTgtFrame = RealFrameId + n + aheadFrame;
+
+                LogicSpeed = offsetFrame / n;
 
                 GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, interval);
             }
@@ -229,29 +269,65 @@ namespace GameCore
         private void ClientLogicTick()
         {
             CFrameId++;
-
-            //在帧结束的时候执行操作
-            canSendOpKey = true;
             GameEvent.LockStep.ClientFrameChange?.Invoke(CFrameId);
-            //对可操作单位所有帧同步行为进行预测
-            var mainHero = GetModule<GameUnitMgr>().MainHero;
-            var heroList = GetModule<GameUnitMgr>().GetEntitiyByType(EntityType.Hero);
-            for (int i = 0; i < heroList.Count; i++)
+
+            if (isSpeedUp)
             {
-                var hero = (heroList[i] as HeroEntity);
-                //本地玩家操作英雄不参与预测
-                if (hero.NetUrl != mainHero.NetUrl)
+                canSendOpKey = false;
+                if (CacheOpKeyQueue.Count > 0)
                 {
-                    var operateInfo = hero.ForcastOpkey(CFrameId);
-                    hero.CacheOperate(CFrameId, operateInfo);
+                    //从缓存逻辑帧中取出一帧进行输入
+                    var opkeyList = CacheOpKeyQueue.Dequeue();
+                    if (opkeyList != null)
+                    {
+                        for (int i = 0; i < opkeyList.Count; i++)
+                        {
+                            var unit = GetModule<GameUnitMgr>().GetSyncUnit(opkeyList[i].PlayerId) as OperableEntity;
+                            var operateInfo = ReferencePool.Accrue<OperateInfo>();
+                            operateInfo.Init(CFrameId, opkeyList[i]);
+                            unit.InputKey(operateInfo);
+                            unit.CacheOperate(CFrameId, operateInfo);
+                        }
+                    }
+                }
+                else
+                {
+                    isSpeedUp = false;
+                    LogicSpeed = 1;
+                    GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, LogicTickInerval);
+                    CFrameId += m_aheadFrame;
+                }
+            }
+            if (!isSpeedUp)
+            {
+                //在帧结束的时候玩家可输入操作
+                canSendOpKey = true;
+                //对可操作单位所有帧同步行为进行预测
+                var mainHero = GetModule<GameUnitMgr>().MainHero;
+                var heroList = GetModule<GameUnitMgr>().GetEntitiyByType(EntityType.Hero);
+                for (int i = 0; i < heroList.Count; i++)
+                {
+                    var hero = (heroList[i] as HeroEntity);
+                    //本地玩家操作英雄不参与预测
+                    if (hero.NetUrl != mainHero.NetUrl)
+                    {
+                        var operateInfo = hero.ForcastOpkey(CFrameId);
+                        hero.CacheOperate(CFrameId, operateInfo);
+                    }
                 }
             }
 
+
+
             EntityClientLogicTick(CFrameId);
+
+            GameEvent.LockStep.ClientLogicTickOver?.Invoke(CFrameId);
+
 
             if (speedChangeTgtFrame == CFrameId && isExpandInterval)
             {
                 Debug.Log("速率变动结束");
+                LogicSpeed = 1;
                 isExpandInterval = false;
                 GetModule<TimerManager>().ChangeMsTickTimerTaskInterval(m_clientTickTimerId, LogicTickInerval);
             }
@@ -272,7 +348,6 @@ namespace GameCore
         private void RealLogicTick()
         {
             RealFrameId++;
-
             GameEvent.LockStep.RealFrameChange?.Invoke(RealFrameId);
 
             ////结束会导致客户端逻辑帧变速时回退过久，执行多次

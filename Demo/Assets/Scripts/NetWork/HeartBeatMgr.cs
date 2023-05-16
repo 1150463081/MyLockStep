@@ -11,11 +11,12 @@ namespace GameCore
         /// 网络延时
         /// </summary>
         public long NetDelay { get; private set; }
+        public string DelayInfo { get; private set; }
 
         private int delay = 500;
         private int sendIndex = 0;
         private int cacheCnt = 10;
-        private Queue<long> timeQueue=new Queue<long>();
+        private Queue<long> timeQueue = new Queue<long>();
         private long timeSum;//所有延时时间和
 
         public override void OnStart()
@@ -34,16 +35,19 @@ namespace GameCore
                 timeSum -= time;
             }
             var nowTime = Utility.Time.MillisecondNow();
-            var offest = nowTime - msg.SendTime;
+            var offest = nowTime - msg.ClientSendTime;
             timeQueue.Enqueue(offest);
             timeSum += offest;
             NetDelay = timeSum / timeQueue.Count;
+            DelayInfo = $"csc:{nowTime - msg.ClientSendTime},cs:{msg.ServerSendTime - msg.ClientSendTime},sc:{nowTime - msg.ServerSendTime}";
+            //todo 跟据当前延时调整客户端逻辑帧领先值
+            
         }
         private void SendHeartBeat()
         {
             var msg = new C2SHeartBeatMsg();
             msg.Index = sendIndex++;
-            msg.SendTime = Utility.Time.MillisecondNow();
+            msg.ClientSendTime = Utility.Time.MillisecondNow();
             GetModule<NetWorkMgr>().SendMsg(NetCmd.C2SHeartBeat, msg);
         }
     }

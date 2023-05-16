@@ -41,7 +41,8 @@ namespace Server
             var mMsg = msg as C2SHeartBeatMsg;
             var s2cMsg = ProtoPool.Accrue<S2CHeartBeatMsg>();
             s2cMsg.Index = mMsg.Index;
-            s2cMsg.SendTime = mMsg.SendTime;
+            s2cMsg.ClientSendTime = mMsg.ClientSendTime;
+            s2cMsg.ServerSendTime = Utility.Time.MillisecondNow();
             ModuleManager.Instance.GetModule<ServerMgr>().SendMsg(mMsg.SessionId, NetCmd.S2CHeartBeat, s2cMsg);
         }
     }

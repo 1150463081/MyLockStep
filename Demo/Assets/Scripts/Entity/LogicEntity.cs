@@ -26,6 +26,13 @@ namespace GameCore
         {
             base.OnInit();
             ModuleManager.Instance.GetModule<RollBackMgr>().Register(this);
+            GameEvent.LockStep.ClientLogicTickOver += OnClientFrameOverHandler;
+        }
+        public override void OnDestroy()
+        {
+            base.OnDestroy();
+            ModuleManager.Instance.GetModule<RollBackMgr>().DeRegister(this);
+            GameEvent.LockStep.ClientLogicTickOver -= OnClientFrameOverHandler;
         }
         public override void OnLoadResComplete()
         {
@@ -34,7 +41,10 @@ namespace GameCore
             ColComp.InitCollider();
             Col = ColComp.Col;
         }
-
+        protected virtual void OnClientFrameOverHandler(int cFrameId)
+        {
+            MoveDir = FXVector3.zero;
+        }
 
 
         //逻辑帧随服务器消息更新
@@ -64,6 +74,7 @@ namespace GameCore
         }
         protected void ViewTickMove()
         {
+
             var tgtPos = Col.Pos.ConvertViewVector3();
             if (tgtPos == transform.position)
             {
@@ -71,7 +82,8 @@ namespace GameCore
             }
             var offest = tgtPos - transform.position;
             var moveDir = offest.normalized;
-            var moveDis = moveDir * BaseVO.MoveSpeed.RawFloat * Time.deltaTime;
+            var logicSpeed = ModuleManager.Instance.GetModule<LogicTickMgr>().LogicSpeed;
+            var moveDis = moveDir * BaseVO.MoveSpeed.RawFloat * Time.deltaTime* logicSpeed;
             if (moveDis.magnitude > offest.magnitude)
             {
                 transform.position = tgtPos;

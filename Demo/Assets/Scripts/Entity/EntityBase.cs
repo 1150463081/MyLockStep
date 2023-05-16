@@ -32,5 +32,9 @@ namespace GameCore
         {
 
         }
+        public virtual void OnDestroy()
+        {
+
+        }
     }
 }
