@@ -64,6 +64,7 @@ namespace SimplePhysx
                 }
             }
             adjust = min * minAdjustNormal;
+            normal = -adjust.normalized;
             return true;
         }
 

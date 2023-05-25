@@ -67,7 +67,7 @@ namespace GameCore
                 {
                     CacheOpKeyQueue.Enqueue(msg.opKeyQueue.Dequeue());
                 }
-                int speed = 4;
+                int speed = 20;
                 int interval = LogicTickInerval / speed;
                 LogicSpeed = speed;
                 m_clientTickTimerId = GetModule<TimerManager>().AddMsTickTimerTask(interval, ClientLogicTick, null, 0);

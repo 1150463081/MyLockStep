@@ -24,7 +24,7 @@ namespace GameCore
             var right = Quaternion.Euler(rotation) * transform.right;
             var forward = Quaternion.Euler(rotation) * transform.forward;
             var up = Quaternion.Euler(rotation) * transform.up;
-            boxCol.Init(new FXVector3(transform.position), new FXInt(Length), new FXInt(Width), new FXVector3(right), new FXVector3(forward), new FXVector3(up));
+            boxCol.Init(new FXVector3(transform.position), new FXInt(Length), new FXInt(Width), new FXVector3(right), new FXVector3(up), new FXVector3(forward));
         }
     }
 }

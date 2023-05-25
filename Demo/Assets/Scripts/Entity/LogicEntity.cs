@@ -13,8 +13,7 @@ namespace GameCore
     public class LogicEntity : EntityBase, IRollBack
     {
         protected IFixedPointCol2DComponent ColComp;
-        protected FixedPointCollider2DBase Col;
-
+        private PathPointUtil pathPointUtil;
 
 
         #region
@@ -37,9 +36,9 @@ namespace GameCore
         public override void OnLoadResComplete()
         {
             base.OnLoadResComplete();
+            pathPointUtil = new PathPointUtil();
             ColComp = gameObject.GetComponentInChildren<FP_BoxCol2DComponent>();
-            ColComp.InitCollider();
-            Col = ColComp.Col;
+            ModuleManager.Instance.GetModule<FixedColliderMgr>().Register(ColComp);
         }
         protected virtual void OnClientFrameOverHandler(int cFrameId)
         {
@@ -60,10 +59,14 @@ namespace GameCore
         }
         protected void LogicTickMove(int frameId)
         {
+
             //逻辑位置更新
-            var pos = Col.Pos + MoveDir * BaseVO.MoveSpeed * ((FXInt)0.066f);
-            Col.SetPos(pos);
-            //transform.position = Col.Pos.ConvertViewVector3();
+            var pos = ColComp.Col.Pos + MoveDir * BaseVO.MoveSpeed * ((FXInt)0.066f);
+            ColComp.Col.SetPos(pos);
+            ModuleManager.Instance.GetModule<FixedColliderMgr>().CalcCollison(ColComp, MoveDir);
+
+            pathPointUtil.AddPathPoint(ColComp.Col.Pos);
+
         }
         #endregion
         #region 表现层本地轮询
@@ -75,7 +78,7 @@ namespace GameCore
         protected void ViewTickMove()
         {
 
-            var tgtPos = Col.Pos.ConvertViewVector3();
+            var tgtPos = ColComp.Col.Pos.ConvertViewVector3();
             if (tgtPos == transform.position)
             {
                 return;
@@ -83,7 +86,7 @@ namespace GameCore
             var offest = tgtPos - transform.position;
             var moveDir = offest.normalized;
             var logicSpeed = ModuleManager.Instance.GetModule<LogicTickMgr>().LogicSpeed;
-            var moveDis = moveDir * BaseVO.MoveSpeed.RawFloat * Time.deltaTime* logicSpeed;
+            var moveDis = moveDir * BaseVO.MoveSpeed.RawFloat * Time.deltaTime * logicSpeed;
             if (moveDis.magnitude > offest.magnitude)
             {
                 transform.position = tgtPos;
@@ -99,12 +102,12 @@ namespace GameCore
 
         public void TakeSnapShot(SnapShotWriter writer)
         {
-            writer.Write(Col.Pos);
+            writer.Write(ColComp.Col.Pos);
         }
 
         public void RollBackTo(SnapShotReader reader)
         {
-            Col.SetPos(reader.ReadFXVector3());
+            ColComp.Col.SetPos(reader.ReadFXVector3());
         }
     }
 }

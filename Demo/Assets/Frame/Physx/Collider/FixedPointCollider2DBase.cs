@@ -15,7 +15,7 @@ namespace SimplePhysx
 
         List<(FXVector3 normal, FXVector3 adjust)> collisionInfos = new List<(FXVector3 normal, FXVector3 adjust)>();
         public void ClacCollison(List<FixedPointCollider2DBase> colliders, ref FXVector3 velocity, ref FXVector3 adjust)
-        { 
+        {
             if (velocity == FXVector3.zero)
             {
                 return;
@@ -25,7 +25,7 @@ namespace SimplePhysx
             collisionInfos.Clear();
             for (int i = 0; i < colliders.Count; i++)
             {
-                if (DetectCollider(colliders[i], ref normal, ref adj))
+                if (colliders[i] != this && DetectCollider(colliders[i], ref normal, ref adj))
                 {
                     collisionInfos.Add((normal, adj));
                 }
@@ -91,8 +91,8 @@ namespace SimplePhysx
 
         public void SetPos(FXVector3 pos)
         {
-            if(pos!=Pos)
-            Pos = pos;
+            if (pos != Pos)
+                Pos = pos;
         }
         private FXVector3 CorrectVelocity(FXVector3 velocity, FXVector3 normal)
         {
