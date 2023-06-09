@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using SimplePhysx;
 
-namespace GameCore
+namespace SimplePhysx
 {
     public interface IFixedPointCol2DComponent
     {

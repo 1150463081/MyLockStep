@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SimplePhysx
 {
-    public class FixedPointSphereCollider2D : FixedPointCollider2DBase
+    public class FixedPointSphereCollider2D : FixedPointCollider2DBase,ISphereShape
     {
         [SerializeField]
         private float editRadius;
@@ -19,22 +19,22 @@ namespace SimplePhysx
             Radius = new FXInt(radius);
         }
 
-        public override bool DetectSphereCollider(FixedPointSphereCollider2D sphereCol, ref FXVector3 normal, ref FXVector3 adjust)
+        public override bool DetectSphereCollider(ISphereShape sphereShape, ref FXVector3 normal, ref FXVector3 adjust)
         {
-            var dis = (Pos - sphereCol.Pos).magnitude;
-            if (dis > Radius + sphereCol.Radius)
+            var dis = (Pos - sphereShape.Pos).magnitude;
+            if (dis > Radius + sphereShape.Radius)
             {
                 return false;
             }
             else
             {
-                normal = (Pos - sphereCol.Pos).normalized;
-                adjust = normal * (Radius + sphereCol.Radius - dis);
+                normal = (Pos - sphereShape.Pos).normalized;
+                adjust = normal * (Radius + sphereShape.Radius - dis);
                 return true;
             }
         }
 
-        public override bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref FXVector3 normal, ref FXVector3 adjust)
+        public override bool DetectBoxCollider(IBoxShape boxShape, ref FXVector3 normal, ref FXVector3 adjust)
         {
             #region 老的检测方法，速度过快会不准确
             ////矩形中心到圆心的向量bo
@@ -64,8 +64,8 @@ namespace SimplePhysx
             //方向和圆形盒子所有投影向量集合
             List<FXVector3> pNormalLst = new List<FXVector3>();
             //获取方形的投影向量
-            var boxVertexs = boxCol.GetVertexs();
-            var boxBorders = boxCol.GetBorders(boxVertexs);
+            var boxVertexs = Utility.Shape.GetVertexs(boxShape); 
+            var boxBorders = Utility.Shape.GetBorders(boxVertexs);
             var pNormal = FXVector3.zero;
             for (int i = 0; i < boxBorders.Length; i++)
             {

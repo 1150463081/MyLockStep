@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LockStepFrame;
 
-namespace GameCore
+namespace SimplePhysx
 {
     public class FP_SphereCol2DComponent : MonoBehaviour, IFixedPointCol2DComponent
     {

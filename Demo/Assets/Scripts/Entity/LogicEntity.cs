@@ -63,7 +63,8 @@ namespace GameCore
             //逻辑位置更新
             var pos = ColComp.Col.Pos + MoveDir * BaseVO.MoveSpeed * ((FXInt)0.066f);
             ColComp.Col.SetPos(pos);
-            ModuleManager.Instance.GetModule<FixedColliderMgr>().CalcCollison(ColComp, MoveDir);
+            var fcMgr = ModuleManager.Instance.GetModule<FixedColliderMgr>();
+            fcMgr.CalcCollison(ColComp, MoveDir);
 
             pathPointUtil.AddPathPoint(ColComp.Col.Pos);
 

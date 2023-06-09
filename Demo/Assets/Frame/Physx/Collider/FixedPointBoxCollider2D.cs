@@ -3,7 +3,7 @@ using LockStepFrame;
 
 namespace SimplePhysx
 {
-    public class FixedPointBoxCollider2D : FixedPointCollider2DBase
+    public class FixedPointBoxCollider2D : FixedPointCollider2DBase, IBoxShape
     {
         public float editLength;
         public float editWidth;
@@ -12,25 +12,23 @@ namespace SimplePhysx
         public FXInt Width { get; protected set; }
         //三个轴的单位向量
         public FXVector3 XAxis { get; protected set; }
-        public FXVector3 YAxis { get; protected set; }
         public FXVector3 ZAxis { get; protected set; }
 
-        public void Init(FXVector3 pos, FXInt length,FXInt width, FXVector3 xAxis, FXVector3 yAxis, FXVector3 zAxis)
+        public void Init(FXVector3 pos, FXInt length, FXInt width, FXVector3 xAxis, FXVector3 yAxis, FXVector3 zAxis)
         {
             Pos = pos;
             Length = length;
             Width = width;
             XAxis = xAxis;
-            YAxis = yAxis;
             ZAxis = zAxis;
         }
-        public override bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref FXVector3 normal, ref FXVector3 adjust)
+        public override bool DetectBoxCollider(IBoxShape boxShape, ref FXVector3 normal, ref FXVector3 adjust)
         {
             //获取边界与顶点
-            var vertexs = GetVertexs();
-            var borders = GetBorders(vertexs);
-            var vertexs_2 = boxCol.GetVertexs();
-            var borders_2 = boxCol.GetBorders(vertexs_2);
+            var vertexs = Utility.Shape.GetVertexs(this);
+            var borders = Utility.Shape.GetBorders(vertexs);
+            var vertexs_2 = Utility.Shape.GetVertexs(boxShape);
+            var borders_2 = Utility.Shape.GetBorders(vertexs_2);
 
             FXInt min = int.MaxValue;
             FXVector3 minNormal = FXVector3.zero;
@@ -68,34 +66,18 @@ namespace SimplePhysx
             return true;
         }
 
-        public override bool DetectSphereCollider(FixedPointSphereCollider2D sphereCol, ref FXVector3 normal, ref FXVector3 adjust)
+        public override bool DetectSphereCollider(ISphereShape sphereShape, ref FXVector3 normal, ref FXVector3 adjust)
         {
-            FXVector3 tmpNormal = FXVector3.zero;
-            FXVector3 tmpAdjust = FXVector3.zero;
-            bool result = sphereCol.DetectBoxCollider(this, ref tmpNormal, ref tmpAdjust);
-            normal = -tmpNormal;
-            adjust = -tmpAdjust;
-            return result;
-        }
-
-
-        public FXVector3[] GetVertexs()
-        {
-            var vertexs = new FXVector3[4];
-            vertexs[0] = Pos + XAxis * Length / 2 + ZAxis * Width / 2;
-            vertexs[1] = Pos + XAxis * Length / 2 - ZAxis * Width / 2;
-            vertexs[2] = Pos - XAxis * Length / 2 - ZAxis * Width / 2;
-            vertexs[3] = Pos - XAxis * Length / 2 + ZAxis * Width / 2;
-            return vertexs;
-        }
-        public FXVector3[] GetBorders(FXVector3[] vertexs)
-        {
-            var borders = new FXVector3[4];
-            borders[0] = vertexs[1] - vertexs[0];
-            borders[1] = vertexs[2] - vertexs[1];
-            borders[2] = vertexs[3] - vertexs[2];
-            borders[3] = vertexs[0] - vertexs[3];
-            return borders;
+            if (sphereShape is FixedPointSphereCollider2D col)
+            {
+                FXVector3 tmpNormal = FXVector3.zero;
+                FXVector3 tmpAdjust = FXVector3.zero;
+                bool result = col.DetectBoxCollider(this, ref tmpNormal, ref tmpAdjust);
+                normal = -tmpNormal;
+                adjust = -tmpAdjust;
+                return result;
+            }
+            return false;
         }
 
 

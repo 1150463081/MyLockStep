@@ -2,6 +2,7 @@ using System;
 using LockStepFrame;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 namespace SimplePhysx
 {
@@ -12,6 +13,10 @@ namespace SimplePhysx
     {
         public string Name { get; protected set; }
         public FXVector3 Pos { get; protected set; }
+        public Action<FixedPointCollider2DBase> OnChangePos;
+
+        //碰撞体所在的宫格
+        public List<QuadCell> QuadCells { get; private set; } = new List<QuadCell>();
 
         List<(FXVector3 normal, FXVector3 adjust)> collisionInfos = new List<(FXVector3 normal, FXVector3 adjust)>();
         public void ClacCollison(List<FixedPointCollider2DBase> colliders, ref FXVector3 velocity, ref FXVector3 adjust)
@@ -82,18 +87,44 @@ namespace SimplePhysx
         /// <param name="sphereCol">球形碰撞盒</param>
         /// <param name="normal">碰撞面法线向量</param>
         /// <param name="adjust">位置修正向量</param>
-        public abstract bool DetectSphereCollider(FixedPointSphereCollider2D sphereCol, ref FXVector3 normal, ref FXVector3 adjust);
+        public abstract bool DetectSphereCollider(ISphereShape sphereShape, ref FXVector3 normal, ref FXVector3 adjust);
 
         /// <param name="boxCol">盒形碰撞盒</param>
         /// <param name="normal">碰撞面法线向量</param>
         /// <param name="adjust">位置修正向量</param>
-        public abstract bool DetectBoxCollider(FixedPointBoxCollider2D boxCol, ref FXVector3 normal, ref FXVector3 adjust);
+        public abstract bool DetectBoxCollider(IBoxShape boxShape, ref FXVector3 normal, ref FXVector3 adjust);
+        public virtual bool DetectBoxCollider(IBoxShape boxShape)
+        {
+            var normal = FXVector3.zero;
+            var adjust = FXVector3.zero;
+            return DetectBoxCollider(boxShape, ref normal, ref adjust);
+        }
 
         public void SetPos(FXVector3 pos)
         {
             if (pos != Pos)
+            {
                 Pos = pos;
+                OnChangePos?.Invoke(this);
+            }
         }
+        public void RefreshCells(List<QuadCell> inRangeCells)
+        {
+            var exitList = QuadCells.Except(inRangeCells).ToList();
+            var enterList = inRangeCells.Except(QuadCells).ToList();
+            //离开的宫格移除该碰撞体
+            for (int i = 0; i < exitList.Count; i++)
+            {
+                exitList[i].ExitCell(this);
+            }
+            //新的宫格添加该碰撞体
+            for (int i = 0; i < enterList.Count; i++)
+            {
+                enterList[i].EnterCell(this);
+            }
+            QuadCells = inRangeCells;
+        }
+
         private FXVector3 CorrectVelocity(FXVector3 velocity, FXVector3 normal)
         {
             if (normal == FXVector3.zero)
@@ -193,5 +224,6 @@ namespace SimplePhysx
             return max;
         }
         #endregion
+
     }
 }

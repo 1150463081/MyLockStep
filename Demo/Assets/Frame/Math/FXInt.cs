@@ -168,7 +168,25 @@ namespace LockStepFrame
                 }
             }
         }
-
+        public FXInt Celling()
+        {
+            int rawInt = RawInt;
+            FXInt a = new FXInt(rawInt);
+            if (a == this)
+            {
+                return a;
+            }
+            else
+            {
+                return new FXInt(rawInt + 1);
+            }
+        }
+        public FXInt Floor()
+        {
+            int rawInt = RawInt;
+            FXInt a = new FXInt(rawInt);
+            return a;
+        }
         public override bool Equals(object obj)
         {
             if (obj == null)
